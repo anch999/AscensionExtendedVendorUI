@@ -1,0 +1,66 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <CheckButton name="ExtendedVendorUITabTemplate" motionScriptsWhileDisabled="true" frameStrata="DIALOG" inherits="TabSystemTabTemplate" virtual="true">
+        <Frames>
+            <Frame name="$parentIcon" parentKey="Icon" inherits="BorderIconTemplate">
+                <Size x="16" y="16"/>
+                <Anchors>
+                    <Anchor point="LEFT" x="10" y="2" />
+                </Anchors>
+            </Frame>
+        </Frames>
+
+        <Scripts>
+            <OnLoad>
+                
+            </OnLoad>
+        </Scripts>
+
+        <ButtonText parentKey="Text">
+            <Size x="0" y="32"/>
+            <Anchors>
+                <Anchor point="CENTER" x="5" y="2"/>
+            </Anchors>
+        </ButtonText>
+
+        <PushedTextOffset x="0" y="-1"/>
+    </CheckButton>
+
+    <Button name="ExtendedVendorUIDropMenuTemplate" motionScriptsWhileDisabled="true" frameStrata="DIALOG" inherits="FilterDropDownMenuTemplate" virtual="true">
+        <Scripts>
+            <OnLoad> </OnLoad>
+            <OnMouseDown> </OnMouseDown>
+            <OnMouseUp> </OnMouseUp>
+            <OnShow> </OnShow>
+            <OnEnter> </OnEnter>
+            <OnLeave> </OnLeave>
+        </Scripts>
+
+        <Layers>           
+            <Layer level="OVERLAY">
+                <FontString name="$parentLable" parentKey="Lable" text="" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="42"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Button>
+
+    <Frame name="ExtendedVendorUIInsetFrameTemplate" virtual="true">
+		<Attributes>
+			<Attribute name="layoutType" value="ExtendedVendorUIInsetFrameTemplate" type="string"/>
+		</Attributes>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Bg" file="Interface\FrameGeneral\UI-Background-Marble" horizTile="true" vertTile="true" setAllPoints="true"/>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentNineSlice" parentKey="NineSlice" setAllPoints="true" inherits="NineSlicePanelTemplate"/>
+		</Frames>
+	</Frame>
+
+    
+</Ui>

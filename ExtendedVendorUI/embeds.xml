@@ -1,0 +1,30 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+<Include file="Templates.xml"/>
+
+<Script file="Libs\LibStub\LibStub.lua"/>
+<Include file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
+
+<Include file="Libs\AceAddon-3.0\AceAddon-3.0.xml"/>
+<Include file="Libs\AceLibrary\AceLibrary.lua"/>
+<Include file="Libs\AceSerializer-3.0\AceSerializer-3.0.xml"/>
+<Include file="Libs\AceComm-3.0\AceComm-3.0.xml"/>
+<Include file="Libs\AceDB-3.0\AceDB-3.0.xml"/>
+<Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml"/>
+<Include file="Libs\AceEvent-3.0\AceEvent-3.0.xml"/>
+<Include file="Libs\AceConsole-3.0\AceConsole-3.0.xml"/>
+<Script file="Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
+<Script file="Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
+<Script file="Libs\SettingsCreater-1.0\SettingsCreater.lua"/>
+
+<Include file="Libs\DewdropLib\embeds.xml"/>
+<Script file="Libs\DewdropLib\Dewdrop-2.0\Dewdrop-2.0.lua"/>
+
+<Script file="ExtendedVendorUI.lua"/>
+<Script file="Options.lua"/>
+<Script file="UI.lua"/>
+<Script file="Utils.lua"/>
+<Script file="Tooltips.lua"/>
+<Script file="Search.lua"/>
+</Ui>
