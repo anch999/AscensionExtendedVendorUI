@@ -31,6 +31,7 @@ function EV:OnEnable()
     self:RegisterEvent("MERCHANT_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
     self:RegisterEvent("MERCHANT_CLOSED")
+    MerchantFrame:UnregisterEvent("MERCHANT_SHOW")
 
     if not self.db[self.realm] then self.db[self.realm] = {} end
     if not self.db[self.realm][self.thisChar] then self.db[self.realm][self.thisChar] = {} end
@@ -40,6 +41,7 @@ function EV:OnEnable()
     self.charWhiteList = self.charDB.WhiteList
     self.blackList = self.db.BlackList
     self:CreateOptionsUI()
+    self:CreateUI()
 end
 
 --[[
@@ -81,8 +83,8 @@ function EV:CopyItemListsFromOldAddon()
 end
 
 function EV:MERCHANT_SHOW()
-    self:CreateUI()
     self:UiOnShow()
+    MerchantFrame_Update()
 end
 
 function EV:MERCHANT_CLOSED()
@@ -93,3 +95,8 @@ function EV:MERCHANT_UPDATE()
     self:SetFrameTab()
     MerchantFrame_Update()
 end
+
+_G["BINDING_HEADER_EXTENDEDVENDORUI"] = "ExtendedVendorUI"
+_G["BINDING_NAME_EXTENDEDVENDORUIBIND1"] = "Add to global white list"
+_G["BINDING_NAME_EXTENDEDVENDORUIBIND2"] = "Add to character white list "
+_G["BINDING_NAME_EXTENDEDVENDORUIBIND3"] = "Add to black list"
