@@ -3,16 +3,14 @@ local CYAN =  "|cff00ffff"
 local LIMEGREEN = "|cFF32CD32"
 --------------- Creates the main misc menu standalone button ---------------
 local itemPerSubPage = 10
-local itemsPerPage = 20
 local numberPages = 1
-local slotFilterIndex = 0
-local statFilterIndex = 0
 local fac = UnitFactionGroup("player")
 
 
 local frameLoaded
 function EV:CreateUI()
         if frameLoaded then return end
+        MERCHANT_ITEMS_PER_PAGE = 20
         -------------------Main Frame-------------------
         self.uiFrame = CreateFrame("FRAME", "ExtendedVendorUi", UIParent, "PortraitFrameTemplate")
         self.uiFrame:SetPoint("CENTER",0,0)
@@ -28,7 +26,10 @@ function EV:CreateUI()
         self.uiFrame:SetScript("OnMouseDown", function()
             self.dewdrop:Close()
         end)
-        self.uiFrame:SetScript("OnHide", function() EV.dewdrop:Close() end)
+        self.uiFrame:SetScript("OnHide", function() 
+            self.dewdrop:Close()
+            self:VendorFrameOnHide()
+            end)
         self.uiFrame:SetScript("OnDragStart", function()
             self.uiFrame:StartMoving()
         end)
@@ -37,6 +38,23 @@ function EV:CreateUI()
         end)
         self.uiFrame:EnableMouseWheel()
         self.uiFrame:SetScript("OnMouseWheel", function(...) self:OnMouseWheel(...) end )
+        self.uiFrame:SetScript("OnUpdate", function()
+            if ( MerchantFrame.itemHover ) then
+                if ( IsModifiedClick("DRESSUP") ) then
+                ShowInspectCursor()
+                else
+                ShowMerchantSellCursor(MerchantFrame.itemHover)
+                end
+            end
+            if ( MerchantRepairItemButton:IsShown() ) then
+                if ( InRepairMode() ) then
+                MerchantRepairItemButton:LockHighlight()
+                else
+                MerchantRepairItemButton:UnlockHighlight()
+                end
+            end
+        end)
+
         --Add the ExtendedVendorUI to the special frames tables to enable closing wih the ESC key
 	    tinsert(UISpecialFrames, "ExtendedVendorUi")
 
@@ -46,7 +64,7 @@ function EV:CreateUI()
         self.uiFrame.itemPanel:SetPoint("CENTER", self.uiFrame, 0, -14)
         self.uiFrame.itemPanel:EnableMouse()
         self.uiFrame.itemPanel:EnableMouseWheel()
-
+        self.uiFrame.itemPanel:SetScript("OnMouseDown", function() self.dewdrop:Close() end)
 
         self.uiFrame.repairFrame = CreateFrame("Frame", "ExtendedVendorUiRepairFrame", self.uiFrame, "InsetFrameTemplate2")
         self.uiFrame.repairFrame:SetSize(150, 55)
@@ -55,16 +73,35 @@ function EV:CreateUI()
         self.uiFrame.buyBackFrame = CreateFrame("Frame", "ExtendedVendorUiBuyBackFrame", self.uiFrame, "InsetFrameTemplate2")
         self.uiFrame.buyBackFrame:SetSize(165, self.uiFrame.repairFrame:GetHeight())
         self.uiFrame.buyBackFrame:SetPoint("LEFT", self.uiFrame.repairFrame, "RIGHT",  0, 0)
+        self.uiFrame.buyBackFrame:SetScript("OnEnter", function()
+            if ( MerchantFrame.itemHover ) then
+                if ( IsModifiedClick("DRESSUP") ) then
+                ShowInspectCursor()
+                else
+                ShowMerchantSellCursor(MerchantFrame.itemHover)
+                end
+            end
+            if ( MerchantRepairItemButton:IsShown() ) then
+                if ( InRepairMode() ) then
+                MerchantRepairItemButton:LockHighlight()
+                else
+                MerchantRepairItemButton:UnlockHighlight()
+                end
+            end
+        end)
 
-
-
-        for buttonNum = 1, itemsPerPage do
+        for buttonNum = 1, MERCHANT_ITEMS_PER_PAGE do
             if _G["MerchantItem" .. buttonNum] then
                 _G["MerchantItem" .. buttonNum]:SetParent(self.uiFrame.itemPanel)
             else
                 CreateFrame("Frame", "MerchantItem" .. buttonNum, self.uiFrame.itemPanel, "MerchantItemTemplate")
             end
         end
+
+        MerchantBuyBackItemItemButton:HookScript("OnEnter", function(button)
+            print("test")
+        end)
+
         MerchantNextPageButton:SetParent(self.uiFrame.itemPanel)
         MerchantNextPageButton:ClearAllPoints()
         MerchantNextPageButton:SetPoint("BOTTOMRIGHT", self.uiFrame.itemPanel, -50, 17)
@@ -99,8 +136,6 @@ function EV:CreateUI()
         self.UpdateRepairButtonsOld = MerchantFrame_UpdateRepairButtons
         MerchantFrame_UpdateRepairButtons = EV.UpdateRepairButtons
 
-        self.selectedTab = "merchantTab"
-        self.uiFrame.tabList = {}
          -------------------Merchant Tab Button-------------------
         self.uiFrame.merchantTabButton = CreateFrame("CheckButton", "ExtendedVendorUiMerchantTabButton", self.uiFrame, "ExtendedVendorUITabTemplate")
         self.uiFrame.merchantTabButton:SetPoint("BOTTOMLEFT", 5, -30)
@@ -108,11 +143,10 @@ function EV:CreateUI()
         self.uiFrame.merchantTabButton.Text:SetText("Merchant")
         self.uiFrame.merchantTabButton.Text:SetPoint("CENTER")
         self.uiFrame.merchantTabButton:SetScript("OnClick", function()
-            self.selectedTab = "merchantTab"
+            MerchantFrame.selectedTab = 1
             PanelTemplates_SetTab(MerchantFrame, 1)
             self:SetFrameTab()
         end)
-        tinsert(self.uiFrame.tabList, "merchantTab")
 
         -------------------Buyback Tab Button-------------------
         self.uiFrame.buybackTabButton = CreateFrame("CheckButton", "ExtendedVendorUiBuybackTabButton", self.uiFrame, "ExtendedVendorUITabTemplate")
@@ -121,16 +155,19 @@ function EV:CreateUI()
         self.uiFrame.buybackTabButton.Text:SetText("Buyback")
         self.uiFrame.buybackTabButton.Text:SetPoint("CENTER")
         self.uiFrame.buybackTabButton:SetScript("OnClick", function(button)
-            self.selectedTab = "buybackTab"
+            MerchantFrame.selectedTab = 2
             PanelTemplates_SetTab(MerchantFrame, 2)
             self:SetFrameTab()
         end)
-        tinsert(self.uiFrame.tabList, "buybackTab")
-
 
         self.uiFrame.filterButton = CreateFrame("Button", "ExtendedVendorUiFilterButton", self.uiFrame, "ExtendedVendorUIDropMenuTemplate")
         self.uiFrame.filterButton:SetPoint("TOPRIGHT", self.uiFrame, -13, -33)
-        self.uiFrame.filterButton:SetScript("OnClick", function(self)
+        self.uiFrame.filterButton:SetScript("OnClick", function(button)
+            if self.dewdrop:IsOpen() then
+                self.dewdrop:Close()
+            else
+                self:OpenFilterMenu(button)
+            end
         end)
 
         --Search Edit Box
@@ -153,7 +190,7 @@ function EV:CreateUI()
         end)
 
         function MerchantItemButton_OnModifiedClick(self, button)
-            if ( ExtendedVendorUI.selectedTab == "merchantTab" ) then
+            if ( MerchantFrame.selectedTab == 1 ) then
                 -- Is merchant frame
                 if ( HandleModifiedItemClick(GetMerchantItemLink(self:GetID())) ) then
                     return;
@@ -182,27 +219,31 @@ function EV:CreateUI()
                 HandleModifiedItemClick(GetBuybackItemLink(self:GetID()))
             end
         end
-
+        self:UpdateButtonPositions()
+        function MerchantFrame:IsShown()
+            if ExtendedVendorUi:IsVisible() then
+                return true
+            end
+        end
         frameLoaded = true
 end
 
 function EV:UpdateButtonPositions()
-    self = ExtendedVendorUI
     local vertSpacing, horizSpacing
-
-    if self.selectedTab == "buybackTab" then
+    if MerchantFrame.selectedTab == 2 then
         vertSpacing = -30
         horizSpacing = 50
     else
         vertSpacing = -16
         horizSpacing = 12
     end
-    for i = 1, itemsPerPage do
+    for i = 1, MERCHANT_ITEMS_PER_PAGE do
         local button = _G["MerchantItem" .. i]
-        if self.selectedTab == "buybackTab" then
+        if MerchantFrame.selectedTab == 2 then
             if (i > BUYBACK_ITEMS_PER_PAGE) then
                 button:Hide()
             else
+                button:ClearAllPoints()
                 if (i == 1) then
                     button:SetPoint("TOPLEFT", ExtendedVendorUiItemFrame, "TOPLEFT", 60, -45)
                 else
@@ -216,12 +257,14 @@ function EV:UpdateButtonPositions()
         else
             button:Show()
             if ((i % itemPerSubPage) == 1) then
+                button:ClearAllPoints()
                 if (i == 1) then
                     button:SetPoint("TOPLEFT", ExtendedVendorUiItemFrame, "TOPLEFT", 15, -15)
                 else
                     button:SetPoint("TOPLEFT", _G["MerchantItem" .. (i - (itemPerSubPage - 1))], "TOPRIGHT", 12, 0)
                 end
             else
+                button:ClearAllPoints()
                 if ((i % 2) == 1) then
                     button:SetPoint("TOPLEFT", _G["MerchantItem" .. (i - 2)], "BOTTOMLEFT", 0, vertSpacing)
                 else
@@ -254,14 +297,13 @@ function EV:UpdateMerchantInfo()
 	local name, texture, price, quantity, numAvailable, isUsable, extendedCost, r, g, b, notOptimal
     local link, quality, itemType, itemSubType, itemId, itemEquipLoc
     local isFiltered = false
-    local isBoP = false
     local isKnown = false
     local isCollectionItemKnow = false
 
     -- **************************************************
     --  Pre-check filtering if hiding filtered items
     -- **************************************************
-    if (EXTVENDOR_DATA['config']['hide_filtered']) then
+    if self.db.FilterList.HideFiltered then
         visibleMerchantItems = 0
         for i = 1, totalMerchantItems, 1 do
 		    name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
@@ -270,83 +312,17 @@ function EV:UpdateMerchantInfo()
                 link = GetMerchantItemLink(i)
                 quality = 1
                 isKnown = false
-                isBoP = false
                 isCollectionItemKnow = false
 
                 -- get info from item link
                 if (link) then
-                    isBoP, isKnown = ExtVendor_GetExtendedItemInfo(link)
+                    isKnown = self:GetRecipeKnown(link)
                     itemId = GetItemInfoFromHyperlink(link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(link)
                 end
-                -- filter known recipes
-                if (EXTVENDOR_DATA['config']['hide_known_recipes'] and isKnown) then
-                    isFiltered = true
-                end
-                -- filter known skill cards
-                if (EXTVENDOR_DATA['config']['hide_known_ascension_collection_items'] and isCollectionItemKnow) then
-                    isFiltered = true
-                end
-                -- filter purchased recipes
-                if (EXTVENDOR_DATA['config']['filter_purchased_recipes']) then
-                    if (itemType == "ITEMTYPE_RECIPE") then
-                        if (GetItemCount(itemId) > 0) then
-                            isFiltered = true
-                        end
-                    end
-                end
-                -- check search filter
-                if (string.len(search) > 0) then
-                    if (not string.find(string.lower(name), string.lower(search), 1, true)) then
-                        isFiltered = true
-                    end
-                end
-                -- check quality filter
-                if (EXTVENDOR_SELECTED_QUALITY > 0) then
-                    if ((quality < EXTVENDOR_SELECTED_QUALITY) or ((quality > EXTVENDOR_SELECTED_QUALITY) and EXTVENDOR_SPECIFIC_QUALITY)) then
-                        isFiltered = true
-                    end
-                end
-                -- check armor filter
-                if EXTVENDOR_DATA['config']['armor_filter'] and not EXTVENDOR_DATA['config']['armor_filter']["All"] and itemType == "Armor" then
-                    for i, v in pairs(EXTVENDOR_DATA['config']['armor_filter']) do
-                        if i == itemSubType and not v then
-                            isFiltered = true
-                        end
-                    end   
-                end
-                -- check slot filter
-                if (slotFilterIndex > 0) then
-                    if (SLOT_FILTERS[slotFilterIndex]) then
-                        local validSlot = false
-                        for _, slot in pairs(SLOT_FILTERS[slotFilterIndex]) do
-                            if (slot == itemEquipLoc) then
-                                validSlot = true
-                            end
-                        end
-                        if (not validSlot) then
-                            isFiltered = true
-                        end
-                    end
-                end
                 
-                -- check stat filter
-                if (statFilterIndex > 0) then
-                    if (STAT_FILTERS[statFilterIndex]) and link then
-                        local ItemStats = {}
-                        GetItemStats(link, ItemStats)
-                        local validSlot = false
-                        for _, slot in pairs(STAT_FILTERS[statFilterIndex]) do
-                            if (ItemStats[slot]) then
-                                validSlot = true
-                            end
-                        end
-                        if (not validSlot) then
-                            isFiltered = true
-                        end
-                    end
-                end
+                isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc)
 
                 -- ***** add item to list if not filtered *****
                 if (not isFiltered) then
@@ -375,7 +351,7 @@ function EV:UpdateMerchantInfo()
     --  Display items on merchant page
     -- **************************************************
     local isAltCurrency = {}
-    
+
     if numButtons then
         for i = 1, numButtons, 1 do
             _G["MerchantFrame_AltCurrency"..i]:Hide()
@@ -447,14 +423,13 @@ function EV:UpdateMerchantInfo()
 				    merchantMoney:Show()
 			    end
 
-                isBoP = false
                 isKnown = false
                 isFiltered = false
                 isCollectionItemKnow = false
 
                 quality = 1
                 if (itemButton.link) then
-                    isBoP, isKnown = ExtVendor_GetExtendedItemInfo(itemButton.link)
+                    isKnown = self:GetRecipeKnown(itemButton.link)
                     itemId = GetItemInfoFromHyperlink(itemButton.link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(itemButton.link)
@@ -464,78 +439,11 @@ function EV:UpdateMerchantInfo()
                 r, g, b = GetItemQualityColor(quality)
                 _G["MerchantItem" .. i .. "Name"]:SetTextColor(r, g, b)
 
-                -- check filtering
-                if (not EXTVENDOR_DATA['config']['hide_filtered']) then
-                    -- check search filter
-                    if (string.len(search) > 0) then
-                        if (not string.find(string.lower(name), string.lower(search), 1, true)) then
-                            isFiltered = true
-                        end
-                    end
-                    -- check quality filter
-                    if (EXTVENDOR_SELECTED_QUALITY > 0) then
-                        if ((quality < EXTVENDOR_SELECTED_QUALITY) or ((quality > EXTVENDOR_SELECTED_QUALITY) and EXTVENDOR_SPECIFIC_QUALITY)) then
-                            isFiltered = true
-                        end
-                    end
-                    -- filter known recipes
-                    if (EXTVENDOR_DATA['config']['hide_known_recipes'] and isKnown) then
-                        isFiltered = true
-                    end
-                    -- filter known skill cards
-                    if (EXTVENDOR_DATA['config']['hide_known_ascension_collection_items'] and isCollectionItemKnow) then
-                        isFiltered = true
-                    end
-                    -- filter purchased recipes
-                    if (EXTVENDOR_DATA['config']['filter_purchased_recipes']) then
-                        if (itemType == "ITEMTYPE_RECIPE") then
-                            if (GetItemCount(itemId) > 0) then
-                                isFiltered = true
-                            end
-                        end
-                    end
-                    -- check armor filter
-                    if EXTVENDOR_DATA['config']['armor_filter'] and not EXTVENDOR_DATA['config']['armor_filter']["All"] and itemType == "Armor" then
-                        for i, v in pairs(EXTVENDOR_DATA['config']['armor_filter']) do
-                            if i == itemSubType and not v then
-                                isFiltered = true
-                            end
-                        end   
-                    end
-                    -- check slot filter
-                    if (slotFilterIndex > 0) then
-                        if (SLOT_FILTERS[slotFilterIndex]) then
-                            local validSlot = false
-                            for _, slot in pairs(SLOT_FILTERS[slotFilterIndex]) do
-                                if (slot == itemEquipLoc) then
-                                    validSlot = true
-                                end
-                            end
-                            if (not validSlot) then
-                                isFiltered = true
-                            end
-                        end
-                    end
-
-                    -- check stat filter
-                    if (statFilterIndex > 0) then
-                        if (STAT_FILTERS[statFilterIndex]) and itemButton.link then
-                            local ItemStats = {}
-                            GetItemStats(itemButton.link, ItemStats)
-                            local validSlot = false
-                            for _, slot in pairs(STAT_FILTERS[statFilterIndex]) do
-                                if (ItemStats[slot]) then
-                                    validSlot = true
-                                end
-                            end
-                            if (not validSlot) then
-                                isFiltered = true
-                            end
-                        end
-                    end
+                if not self.db.FilterList.HideFiltered then
+                    isFiltered = self:IsFiltered(itemButton.link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc)
                 end
 
-                ExtVendor_SearchDimItem(_G["MerchantItem" .. i], isFiltered)
+                self:SearchDimItem(_G["MerchantItem" .. i], isFiltered)
 
 			    itemButton.hasItem = true
 			    itemButton:SetID(indexes[index])
@@ -573,7 +481,7 @@ function EV:UpdateMerchantInfo()
 			_G["MerchantItem" .. i.."Name"]:SetText("")
 			_G["MerchantItem" .. i.."MoneyFrame"]:Hide()
 			_G["MerchantItem" .. i.."AltCurrencyFrame"]:Hide()
-            ExtVendor_SearchDimItem(_G["MerchantItem" .. i], false)
+            self:SearchDimItem(_G["MerchantItem" .. i], false)
         end
     end
 
@@ -636,7 +544,7 @@ function EV:UpdateMerchantInfo()
 
     local numHiddenItems = math.max(0, totalMerchantItems - visibleMerchantItems)
     local hstring = (numHiddenItems == 1) and "SINGLE_ITEM_HIDDEN" or "MULTI_ITEMS_HIDDEN"
-    MerchantFrameHiddenText:SetText(string.format(hstring, numHiddenItems))
+    --MerchantFrameHiddenText:SetText(string.format(hstring, numHiddenItems))
 
     -- update text color for buyback slot
     local link = GetBuybackItemLink(GetNumBuybackItems())
@@ -646,11 +554,11 @@ function EV:UpdateMerchantInfo()
         MerchantBuyBackItemName:SetTextColor(r, g, b)
     end
 
-    if (ExtVendor_GetQuickVendorList()) then
+--[[     if (ExtVendor_GetQuickVendorList()) then
         ExtVendor_SetJunkButtonState(true)
     else
         ExtVendor_SetJunkButtonState(false)
-    end
+    end ]]
 end
 
 --========================================
@@ -719,23 +627,23 @@ function EV:OnMouseWheel(self, delta)
 end
 
 function EV:UiOnShow()
-    self.selectedTab = "merchantTab"
+    MerchantFrame.selectedTab = 1
     self:SetFrameTab()
     self.uiFrame:Show()
 end
 
 function EV:SetFrameTab()
-    for _, tab in pairs(self.uiFrame.tabList) do
-        if tab ~= self.selectedTab then
-            self.uiFrame[tab.."Button"]:SetChecked(false)
-            self.uiFrame[tab.."Button"]:UpdateButton()
-        end
-    end
-    self.uiFrame[self.selectedTab.."Button"]:SetChecked(true)
-    self.uiFrame[self.selectedTab.."Button"]:UpdateButton()
-    if self.selectedTab == "merchantTab" then
+    if MerchantFrame.selectedTab == 1 then
+        self.uiFrame.merchantTabButton:SetChecked(true)
+        self.uiFrame.merchantTabButton:UpdateButton()
+        self.uiFrame.buybackTabButton:SetChecked(false)
+        self.uiFrame.buybackTabButton:UpdateButton()
         self:UpdateMerchantInfo()
-    elseif self.selectedTab == "buybackTab" then
+    elseif MerchantFrame.selectedTab == 2 then
+        self.uiFrame.buybackTabButton:SetChecked(true)
+        self.uiFrame.buybackTabButton:UpdateButton()
+        self.uiFrame.merchantTabButton:SetChecked(false)
+        self.uiFrame.merchantTabButton:UpdateButton()
         self:UpdateBuybackInfo()
     end
 end
@@ -850,7 +758,7 @@ end
 function EV:UpdateRepairButtons()
     self = ExtendedVendorUI
     self:UpdateRepairButtonsOld()
-    if self.selectedTab == "merchantTab" then
+    if MerchantFrame.selectedTab == 1 then
         self.uiFrame.repairFrame:Show()
         self.uiFrame.buyBackFrame:Show()
     else
@@ -867,44 +775,23 @@ function EV:UpdateRepairButtons()
     MerchantRepairSettingsButton:SetPoint("TOPRIGHT", self.uiFrame.repairFrame, -3, -3)
     MerchantBuyBackItem:ClearAllPoints()
     MerchantBuyBackItem:SetPoint("LEFT", self.uiFrame.repairFrame, "RIGHT", 9, -1.2)
+end
+
+function MerchantFrame_OnHide()
 
 end
 
---sets up the drop down menu for any menus
-function EV:DewdropRegister(button)
-    if self.dewdrop:IsOpen(button) then self.dewdrop:Close() return end
-    self.dewdrop:Register(button,
-        'point', function(parent)
-            return "TOP", "BOTTOM"
-        end,
-        'children', function(level, value)
-            for name, char in pairs(self.containersDB) do
-                self.dewdrop:AddLine(
-                    'text', name,
-                    'func', function()
-                        self.selectedCharacter = name
-                        self.uiFrame.characterSelect:SetText(self.selectedCharacter)
-                        self:SetScrollFrame()
-                    end,
-                    'textHeight', self.db.txtSize,
-                    'textWidth', self.db.txtSize,
-                    'closeWhenClicked', true,
-                    'notCheckable', true
-                )
-            end
-            self:AddDividerLine(35)
-            self.dewdrop:AddLine(
-				'text', "|cFF00FFFFClose Menu",
-                'textHeight', self.db.txtSize,
-                'textWidth', self.db.txtSize,
-				'closeWhenClicked', true,
-				'notCheckable', true
-			)
-		end,
-		'dontHook', true
-	)
-    self.dewdrop:Open(button)
+function EV:VendorFrameOnHide()
+    MerchantFrame.isSelling = false
+    CloseMerchant()
+    if ( not BACKPACK_WAS_OPEN ) then
+        CloseBackpack()
+    end
+    ResetCursor()
 
-    GameTooltip:Hide()
+    StaticPopup_Hide("CONFIRM_PURCHASE_TOKEN_ITEM")
+    StaticPopup_Hide("CONFIRM_REFUND_TOKEN_ITEM")
+    StaticPopup_Hide("CONFIRM_REFUND_MAX_HONOR")
+    StaticPopup_Hide("CONFIRM_REFUND_MAX_ARENA_POINTS")
+    PlaySound("igCharacterInfoClose")
 end
-

@@ -25,6 +25,45 @@ function EV:IsRealmbound(bag, slot)
     return false
 end
 
+--========================================
+-- Retrieve additional item info via the
+-- item's tooltip
+--========================================
+function EV:GetRecipeKnown(link)
+    -- set up return values
+    local isBoP = false
+    local isKnown = false;
+    local classes = {};
+
+    -- generate item tooltip in hidden tooltip object
+    cTip:SetOwner(UIParent, "ANCHOR_LEFT")
+    local ok = pcall( function() cTip:SetHyperlink(link) end, link)
+    if (ok) then
+        for cl = 2, cTip:NumLines(), 1 do
+            local checkLine = _G["cTooltipTextLeft" .. cl]:GetText()
+            if (checkLine) then
+
+                -- check if item binds when picked up
+                if (cl <= 3) then
+                    if (checkLine == ITEM_BIND_ON_PICKUP) then
+                        isBoP = true
+                    end
+                end
+
+                -- check for "Already Known"
+                if (checkLine == ITEM_SPELL_KNOWN) then
+                    isKnown = true
+                end
+            end
+        end
+
+    end
+
+    cTip:Hide()
+
+    return isKnown
+end
+
 --for a adding a divider to dew drop menus 
 function EV:AddDividerLine(maxLenght)
     local text = WHITE.."----------------------------------------------------------------------------------------------------"

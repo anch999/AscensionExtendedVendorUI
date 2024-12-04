@@ -25,6 +25,5 @@
 <Script file="Options.lua"/>
 <Script file="UI.lua"/>
 <Script file="Utils.lua"/>
-<Script file="Tooltips.lua"/>
-<Script file="Search.lua"/>
+<Script file="Filter.lua"/>
 </Ui>
