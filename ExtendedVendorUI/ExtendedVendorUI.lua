@@ -69,17 +69,29 @@ end
 
 function EV:CopyItemListsFromOldAddon()
     if EXTVENDOR_DATA then
-        if EXTVENDOR_DATA.quickvendor_blacklist then
-            for _, itemID in pairs(EXTVENDOR_DATA.quickvendor_blacklist) do
-                self.blackList[itemID] = true
+        for listName, list in pairs(EXTVENDOR_DATA) do
+            if listName == "quickvendor_blacklist" then
+                for _, itemID in pairs(list) do
+                    if itemID then self.blackList[itemID] = true end
+                end
+            elseif listName == "quickvendor_whitelist" then
+                for _, itemID in pairs(list) do
+                    if itemID then self.whiteList[itemID] = true end
+                end
+            else
+                local realm, character = strsplit('.', listName, 2)
+                if realm and character then
+                    self.db[realm] = self.db[realm] or {}
+                    self.db[realm][character] = self.db[realm][character] or {}
+                    self.db[realm][character]["WhiteList"] = self.db[realm][character]["WhiteList"] or {}
+                    for _, itemID in pairs(list.quickvendor_whitelist) do
+                        if itemID then
+                            self.db[realm][character]["WhiteList"][itemID] = true
+                        end
+                    end
+                end
             end
         end
-        if EXTVENDOR_DATA.quickvendor_whitelist then
-            for _, itemID in pairs(EXTVENDOR_DATA.quickvendor_whitelist) do
-                self.whiteList[itemID] = true
-            end
-        end
-
     end
 end
 
