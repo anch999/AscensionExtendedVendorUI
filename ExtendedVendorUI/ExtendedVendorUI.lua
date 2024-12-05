@@ -6,12 +6,14 @@ EV.Version = 1
 local CYAN =  "|cff00ffff"
 local WHITE = "|cffFFFFFF"
 EV.defaultIcon = "Interface\\Icons\\INV_Misc_Book_06"
+EV.worldFrameHook = {}
 
 --Set Savedvariables defaults
 local DefaultSettings  = {
     TxtSize         = 12,
     WhiteList = {},
     BlackList = {},
+    AutoVendor = false,
 }
 
 function EV:OnInitialize()
@@ -31,7 +33,6 @@ function EV:OnEnable()
     self:RegisterEvent("MERCHANT_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
     self:RegisterEvent("MERCHANT_CLOSED")
-    MerchantFrame:UnregisterEvent("MERCHANT_SHOW")
 
     if not self.db[self.realm] then self.db[self.realm] = {} end
     if not self.db[self.realm][self.thisChar] then self.db[self.realm][self.thisChar] = {} end
@@ -62,7 +63,7 @@ function EV:SlashCommand(msg)
     elseif cmd == "copyoldaddon" then
         self:CopyItemListsFromOldAddon()
     else
-
+        self:AutoVendorConfigOpen()
     end
 end
 
@@ -84,7 +85,6 @@ end
 
 function EV:MERCHANT_SHOW()
     self:UiOnShow()
-    MerchantFrame_Update()
 end
 
 function EV:MERCHANT_CLOSED()
@@ -93,7 +93,6 @@ end
 
 function EV:MERCHANT_UPDATE()
     self:SetFrameTab()
-    MerchantFrame_Update()
 end
 
 _G["BINDING_HEADER_EXTENDEDVENDORUI"] = "ExtendedVendorUI"

@@ -6,62 +6,37 @@ local ORANGE= "|cFFFFA500"
 local AQUA  = "|cFF00FFFF"
 local GREEN  = "|cff00ff00"
 
-
-
-
-local cTip = CreateFrame("GameTooltip","cTooltip",nil,"GameTooltipTemplate")
-
-function EV:IsRealmbound(bag, slot)
-    cTip:SetOwner(UIParent, "ANCHOR_NONE")
-    cTip:SetBagItem(bag, slot)
-    cTip:Show()
-    for i = 1,cTip:NumLines() do
-        local text = _G["cTooltipTextLeft"..i]:GetText()
-        if text == "Realm Bound" or text == ITEM_SOULBOUND then
-            return text
-        end
-    end
-    cTip:Hide()
-    return false
-end
-
 --========================================
 -- Retrieve additional item info via the
 -- item's tooltip
 --========================================
-function EV:GetRecipeKnown(link)
+local cTip = CreateFrame("GameTooltip","cTooltip",nil,"GameTooltipTemplate")
+function EV:GetTooltipItemInfo(link, bag, slot)
+    cTip:SetOwner(UIParent, "ANCHOR_NONE")
+
     -- set up return values
-    local isBoP = false
-    local isKnown = false;
-    local classes = {};
+    local binds = {}
 
     -- generate item tooltip in hidden tooltip object
-    cTip:SetOwner(UIParent, "ANCHOR_LEFT")
-    local ok = pcall( function() cTip:SetHyperlink(link) end, link)
-    if (ok) then
-        for cl = 2, cTip:NumLines(), 1 do
-            local checkLine = _G["cTooltipTextLeft" .. cl]:GetText()
-            if (checkLine) then
+    if link then
+        cTip:SetHyperlink(link)
+    elseif bag and slot then
+        cTip:SetBagItem(bag, slot)
+    else
+        return
+    end
 
-                -- check if item binds when picked up
-                if (cl <= 3) then
-                    if (checkLine == ITEM_BIND_ON_PICKUP) then
-                        isBoP = true
-                    end
-                end
-
-                -- check for "Already Known"
-                if (checkLine == ITEM_SPELL_KNOWN) then
-                    isKnown = true
-                end
-            end
-        end
-
+    for i = 1,cTip:NumLines() do
+        local text = _G["cTooltipTextLeft"..i]:GetText()
+        if text == "Realm Bound" then binds.isRealmbound = true end
+        if text == ITEM_SOULBOUND then  binds.isSoulbound = true end
+        if text == ITEM_BIND_ON_PICKUP then binds.isBoP = true end
+        if text == ITEM_SPELL_KNOWN then binds.isKnown = true end
     end
 
     cTip:Hide()
 
-    return isKnown
+    return binds
 end
 
 --for a adding a divider to dew drop menus 
@@ -83,18 +58,6 @@ function EV:GetTipAnchor(frame)
     local hhalf = (x > UIParent:GetWidth() * 2 / 3) and 'RIGHT' or (x < UIParent:GetWidth() / 3) and 'LEFT' or ''
     local vhalf = (y > UIParent:GetHeight() / 2) and 'TOP' or 'BOTTOM'
     return vhalf .. hhalf, frame, (vhalf == 'TOP' and 'BOTTOM' or 'TOP') .. hhalf
-end
-
-function EV:OnEnter(button, show)
-    if self.db.autoMenu and not UnitAffectingCombat("player") then
-        self:DewdropRegister(button, show)
-    else
-        GameTooltip:SetOwner(button, 'ANCHOR_NONE')
-        GameTooltip:SetPoint(EV:GetTipAnchor(button))
-        GameTooltip:ClearLines()
-        GameTooltip:AddLine("ExtendedVendorUI")
-        GameTooltip:Show()
-    end
 end
 
 function EV:PairsByKeys(t, reverse)
@@ -133,6 +96,7 @@ local itemEquipLocConversion = {
 }
 function EV:GetItemInfo(item)
 	item = tonumber(item) and Item:CreateFromID(item) or Item:CreateFromLink(item)
+    if not item.itemID then return end
 	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.itemID)
 	if not item:GetInfo() then
 		local itemInstant = GetItemInfoInstant(item.itemID)

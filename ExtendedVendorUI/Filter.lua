@@ -4,7 +4,8 @@ local FilterList = {
     {"Hide Filtered", "HideFiltered"},
     {"Unlearned Recipes Only", "HideLearnedRecipes"},
     {"Filter Known Skill Cars/Vanity Items", "HideVanity"},
-    {   Name = "Recipe Filtering",
+    {
+        Name = "Recipe Filtering",
         {
         Name = "Recipe Filters",
         {"Hide Already Known", "HideKnown"},
@@ -136,9 +137,9 @@ function EV:UpdateFilterMenu(level, value)
             'textHeight', self.db.TxtSize,
             'textWidth', self.db.TxtSize,
             'notCheckable', true,
-            'text', "Auto Vendor",
+            'text', "Auto Vendor Config",
             'closeWhenClicked', true,
-            'func', function() end
+            'func', function() self:AutoVendorConfigOpen() end
         )
         self.dewdrop:AddLine(
             'textHeight', self.db.TxtSize,
@@ -272,7 +273,6 @@ function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, item
 end
 
 -- ["robe"] = "INVTYPE_ROBE", note add a swap for robes  {"Body", "INVTYPE_BODY"},
-local worldFrameHook = {}
 function EV:OpenFilterMenu(button)
     GameTooltip:Hide()
     if self.dewdrop:Open(button) then self.dewdrop:Close() return end
@@ -284,13 +284,13 @@ function EV:OpenFilterMenu(button)
     'children', function(level, value)
         self:UpdateFilterMenu(level, value)
     end)
-    if not worldFrameHook[button:GetName()] then
+    if not self.worldFrameHook[button:GetName()] then
         WorldFrame:HookScript("OnEnter", function()
         if self.dewdrop:IsOpen(button) then
             self.dewdrop:Close()
         end
     end)
-    worldFrameHook[button:GetName()] = true
+    self.worldFrameHook[button:GetName()] = true
     end
 end
 

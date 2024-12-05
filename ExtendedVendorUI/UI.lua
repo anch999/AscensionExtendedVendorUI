@@ -21,6 +21,7 @@ function EV:CreateUI()
         self.uiFrame:RegisterForDrag("LeftButton")
         self.uiFrame:EnableKeyboard(true)
         self.uiFrame:SetToplevel(true)
+        self.uiFrame:SetScale(self.db.MerchantFrameScale or 1)
         self.uiFrame:Hide()
         self.uiFrame:SetScript("OnShow", function() self:UiOnShow() end)
         self.uiFrame:SetScript("OnMouseDown", function()
@@ -73,22 +74,6 @@ function EV:CreateUI()
         self.uiFrame.buyBackFrame = CreateFrame("Frame", "ExtendedVendorUiBuyBackFrame", self.uiFrame, "InsetFrameTemplate2")
         self.uiFrame.buyBackFrame:SetSize(165, self.uiFrame.repairFrame:GetHeight())
         self.uiFrame.buyBackFrame:SetPoint("LEFT", self.uiFrame.repairFrame, "RIGHT",  0, 0)
-        self.uiFrame.buyBackFrame:SetScript("OnEnter", function()
-            if ( MerchantFrame.itemHover ) then
-                if ( IsModifiedClick("DRESSUP") ) then
-                ShowInspectCursor()
-                else
-                ShowMerchantSellCursor(MerchantFrame.itemHover)
-                end
-            end
-            if ( MerchantRepairItemButton:IsShown() ) then
-                if ( InRepairMode() ) then
-                MerchantRepairItemButton:LockHighlight()
-                else
-                MerchantRepairItemButton:UnlockHighlight()
-                end
-            end
-        end)
 
         for buttonNum = 1, MERCHANT_ITEMS_PER_PAGE do
             if _G["MerchantItem" .. buttonNum] then
@@ -97,10 +82,6 @@ function EV:CreateUI()
                 CreateFrame("Frame", "MerchantItem" .. buttonNum, self.uiFrame.itemPanel, "MerchantItemTemplate")
             end
         end
-
-        MerchantBuyBackItemItemButton:HookScript("OnEnter", function(button)
-            print("test")
-        end)
 
         MerchantNextPageButton:SetParent(self.uiFrame.itemPanel)
         MerchantNextPageButton:ClearAllPoints()
@@ -125,7 +106,12 @@ function EV:CreateUI()
         MerchantBuyBackItem:SetParent(self.uiFrame.buyBackFrame)
         MerchantPageText:SetParent(self.uiFrame.repairFrame)
         MerchantRepairSettingsButton:SetParent(self.uiFrame.repairFrame)
-
+        MerchantFrame:SetAlpha(0)
+        MerchantFrameTab1:Hide()
+        MerchantFrameTab2:Hide()
+        MerchantFrameCloseButton:Hide()
+        MerchantFrameSellJunkFrame:Hide()
+        C_CVar.Set("autoSellJunk", "0")
 
 
 
@@ -220,11 +206,7 @@ function EV:CreateUI()
             end
         end
         self:UpdateButtonPositions()
-        function MerchantFrame:IsShown()
-            if ExtendedVendorUi:IsVisible() then
-                return true
-            end
-        end
+
         frameLoaded = true
 end
 
@@ -316,12 +298,12 @@ function EV:UpdateMerchantInfo()
 
                 -- get info from item link
                 if (link) then
-                    isKnown = self:GetRecipeKnown(link)
+                    isKnown = self:GetTooltipItemInfo(link).isKnown
                     itemId = GetItemInfoFromHyperlink(link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(link)
                 end
-                
+
                 isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc)
 
                 -- ***** add item to list if not filtered *****
@@ -390,8 +372,8 @@ function EV:UpdateMerchantInfo()
                         isAltCurrency.honor = {"honor", true, "honor"}
                     elseif arenaPoints > 0 then
                         isAltCurrency.arena = {"arena", true, "arena"}
-                    elseif _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink then 
-                        local _, id = strsplit(":", _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink)
+                    elseif _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink then
+                        local id = GetItemInfoFromHyperlink(_G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink)
                         isAltCurrency[id] = {id}
                     end
 			    elseif ( extendedCost and (price > 0) ) then
@@ -409,8 +391,8 @@ function EV:UpdateMerchantInfo()
                         isAltCurrency.honor = {"honor", true, "honor"}
                     elseif arenaPoints > 0 then
                         isAltCurrency.arena = {"arena", true, "arena"}
-                    elseif _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink then  
-                        local _, id = strsplit(":", _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink)
+                    elseif _G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink then
+                        local id = GetItemInfoFromHyperlink(_G["MerchantItem" .. i .. "AltCurrencyFrameItem1"].itemLink)
                         isAltCurrency[id] = {id}
                     end
 			    else
@@ -429,7 +411,7 @@ function EV:UpdateMerchantInfo()
 
                 quality = 1
                 if (itemButton.link) then
-                    isKnown = self:GetRecipeKnown(itemButton.link)
+                    isKnown = self:GetTooltipItemInfo(itemButton.link).isKnown
                     itemId = GetItemInfoFromHyperlink(itemButton.link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(itemButton.link)
@@ -630,6 +612,9 @@ function EV:UiOnShow()
     MerchantFrame.selectedTab = 1
     self:SetFrameTab()
     self.uiFrame:Show()
+    if self.db.AutoVendor and not MerchantFrame.hasSoldJunk then
+        self:AutoVendorItems()
+    end
 end
 
 function EV:SetFrameTab()
@@ -648,8 +633,6 @@ function EV:SetFrameTab()
     end
 end
 
-
-
 function EV:UpdateAltCurrency(currencyTable)
     local i = 1
     local sorted = {}
@@ -657,7 +640,7 @@ function EV:UpdateAltCurrency(currencyTable)
         if id == "honor" or id == "arena" then
             sorted[id] = v
         else
-            sorted[self:GetItemInfo(v[1])] = v
+            sorted[self:GetItemInfo(v[1])..id] = v
         end
     end
     table.sort(sorted)
@@ -667,15 +650,13 @@ function EV:UpdateAltCurrency(currencyTable)
             if currency[2] and currency[3] == "honor" then
                 button.itemID = "Honor Points"
                 button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..fac);
-                button.Lable:SetText("Honor Points: |cffffffff"..GetHonorCurrency())
                 button.icon:SetSize(16,16);
-                EV:ScheduleTimer(updateCurrency, .2, "honor", button)
+                Timer.After(.2, function() button.Lable:SetText("Honor Points: |cffffffff"..GetHonorCurrency()) end)
             elseif currency[2] and currency[3] == "arena" then
                 button.itemID = "Arena Points"
                 button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon");
-                button.Lable:SetText("Arena Points: |cffffffff"..GetArenaCurrency())
                 button.icon:SetSize(16,16);
-                EV:ScheduleTimer(updateCurrency, .2, "arena", button)
+                Timer.After(.2, function() button.Lable:SetText("Arena Points: |cffffffff"..GetArenaCurrency()) end)
             else
                 button.itemID = currency[1]
                 button.icon:SetTexture(GetItemIcon(currency[1]));
@@ -689,7 +670,7 @@ function EV:UpdateAltCurrency(currencyTable)
             else
                 local lastFrame = i - 1
                 button:ClearAllPoints()
-                button:SetPoint("RIGHT",_G["MerchantFrame_AltCurrency"..lastFrame], (- button.Lable:GetStringWidth()) - 20,0);
+                button:SetPoint("RIGHT",_G["MerchantFrame_AltCurrency"..lastFrame], "LEFT", (button.Lable:GetStringWidth() - 20) , 0);
             end
             button:SetWidth(button.Lable:GetStringWidth() + 15)
             button:Show()

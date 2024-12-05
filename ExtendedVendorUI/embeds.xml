@@ -26,4 +26,5 @@
 <Script file="UI.lua"/>
 <Script file="Utils.lua"/>
 <Script file="Filter.lua"/>
+<Script file="AutoVendor.lua"/>
 </Ui>

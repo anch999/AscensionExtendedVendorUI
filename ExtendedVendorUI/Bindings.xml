@@ -1,5 +1,5 @@
 <Bindings>
-	<Binding name="EXTENDEDVENDORUIBIND1" header="EXTENDEDVENDORUI"> ExtendedVendorUI:AddToVendorList("whitelist") </Binding>
-	<Binding name="EXTENDEDVENDORUIBIND2"> ExtendedVendorUI:AddToVendorList("whitelistchar") </Binding>
-	<Binding name="EXTENDEDVENDORUIBIND3"> ExtendedVendorUI:AddToVendorList("blacklist") </Binding>
+	<Binding name="EXTENDEDVENDORUIBIND1" header="EXTENDEDVENDORUI"> ExtendedVendorUI:AddVendorListItem("whiteList") </Binding>
+	<Binding name="EXTENDEDVENDORUIBIND2"> ExtendedVendorUI:AddVendorListItem("charWhiteList") </Binding>
+	<Binding name="EXTENDEDVENDORUIBIND3"> ExtendedVendorUI:AddVendorListItem("blackList") </Binding>
 </Bindings>
