@@ -286,11 +286,11 @@ function EV:AutoVendorItems()
 			for slot = 1, GetContainerNumSlots(bag) do
 				local itemID = GetContainerItemID(bag, slot)
 				if itemID then
-					local _, link, quality, _, _, invType, _, _, _, _, vendorSell = GetItemInfo(itemID)
+					local _, link, quality, _, _, invType, itemSubType, _, _, _, vendorSell = GetItemInfo(itemID)
                     local tootltipInfo = self:GetTooltipItemInfo(link)
 					if not self.blackList[itemID] and (self.whiteList[itemID] or self.charWhiteList[itemID] or
                     (quality and quality == 0 and invType and invType ~= "Quest" and vendorSell and vendorSell > 0) or
-                    (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and vendorSell and vendorSell > 0) or
+                    (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and (itemSubType ~= "INVTYPE_TABARD" or itemSubType ~= "INVTYPE_SHIRT") and vendorSell and vendorSell > 0) or
                     (self.db.AlreadyKnownBop and tootltipInfo.isKnown and (tootltipInfo.isBoP or tootltipInfo.isSoulbound)) or
                     (self.db.AlreadyKnownBoe and tootltipInfo.isKnown and (not tootltipInfo.isBoP and not tootltipInfo.isSoulbound))) then
 						local itemCount = select(2, GetContainerItemInfo(bag, slot)) or 1
