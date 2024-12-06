@@ -39,22 +39,6 @@ function EV:CreateUI()
         end)
         self.uiFrame:EnableMouseWheel()
         self.uiFrame:SetScript("OnMouseWheel", function(...) self:OnMouseWheel(...) end )
-        self.uiFrame:SetScript("OnUpdate", function()
-            if ( MerchantFrame.itemHover ) then
-                if ( IsModifiedClick("DRESSUP") ) then
-                ShowInspectCursor()
-                else
-                ShowMerchantSellCursor(MerchantFrame.itemHover)
-                end
-            end
-            if ( MerchantRepairItemButton:IsShown() ) then
-                if ( InRepairMode() ) then
-                MerchantRepairItemButton:LockHighlight()
-                else
-                MerchantRepairItemButton:UnlockHighlight()
-                end
-            end
-        end)
 
         --Add the ExtendedVendorUI to the special frames tables to enable closing wih the ESC key
 	    tinsert(UISpecialFrames, "ExtendedVendorUi")
@@ -83,6 +67,13 @@ function EV:CreateUI()
             end
         end
 
+        self.uiFrame.currencyBar = CreateFrame("Frame", nil, self.uiFrame, "CurrencyBarClassicTemplate")
+        self.uiFrame.currencyBar:SetSize((self.uiFrame:GetWidth()-24), 23)
+        self.uiFrame.currencyBar:SetPoint("BOTTOM", self.uiFrame, 0, 7)
+
+        MerchantMoneyFrame:SetParent(self.uiFrame)
+        MerchantMoneyFrame:ClearAllPoints()
+        MerchantMoneyFrame:SetPoint("RIGHT", self.uiFrame.currencyBar)
         MerchantNextPageButton:SetParent(self.uiFrame.itemPanel)
         MerchantNextPageButton:ClearAllPoints()
         MerchantNextPageButton:SetPoint("BOTTOMRIGHT", self.uiFrame.itemPanel, -50, 17)
@@ -92,20 +83,17 @@ function EV:CreateUI()
         MerchantPrevPageButton:SetParent(self.uiFrame.itemPanel)
         MerchantPrevPageButton:ClearAllPoints()
         MerchantPrevPageButton:SetPoint("RIGHT", MerchantPageText, "LEFT", -30, 0)
-
-        self.uiFrame.currencyBar = CreateFrame("Frame", nil, self.uiFrame, "CurrencyBarClassicTemplate")
-        self.uiFrame.currencyBar:SetSize((self.uiFrame:GetWidth()-24), 23)
-        self.uiFrame.currencyBar:SetPoint("BOTTOM", self.uiFrame, 0, 7)
-        MerchantMoneyFrame:SetParent(self.uiFrame)
-        MerchantMoneyFrame:ClearAllPoints()
-        MerchantMoneyFrame:SetPoint("RIGHT", self.uiFrame.currencyBar)
-
         MerchantRepairAllButton:SetParent(self.uiFrame.repairFrame)
         MerchantRepairItemButton:SetParent(self.uiFrame.repairFrame)
         MerchantGuildBankRepairButton:SetParent(self.uiFrame.repairFrame)
         MerchantBuyBackItem:SetParent(self.uiFrame.buyBackFrame)
         MerchantPageText:SetParent(self.uiFrame.repairFrame)
         MerchantRepairSettingsButton:SetParent(self.uiFrame.repairFrame)
+        MerchantFrameSellJunkFrame:Hide()
+        MerchantFrame:SetParent(self.uiFrame)
+        MerchantFrame:ClearAllPoints()
+        MerchantFrame:SetPoint("TOPLEFT", self.uiFrame, -10, 10)
+        MerchantFrame:SetFrameStrata("Background")
         MerchantFrame:SetAlpha(0)
         MerchantFrameTab1:Hide()
         MerchantFrameTab2:Hide()
