@@ -17,7 +17,7 @@ function EV:AutoVendorFrameCreate()
         self.selectedList = "whiteList"
 
         self.autoVendorFrame = CreateFrame("FRAME", "ExtendedVendorUIAutoVendorFrame", UIParent,"UIPanelDialogTemplate")
-        self.autoVendorFrame:SetSize(400,700)
+        self.autoVendorFrame:SetSize(400,500)
         self.autoVendorFrame:SetPoint("CENTER",0,0)
         self.autoVendorFrame:EnableMouse(true)
         self.autoVendorFrame:SetMovable(true)
@@ -101,7 +101,7 @@ function EV:AutoVendorFrameCreate()
 	--ScrollFrame
 
 	local ROW_HEIGHT = 20   -- How tall is each row?
-	local MAX_ROWS = 25      -- How many rows can be shown at once?
+	local MAX_ROWS = 15      -- How many rows can be shown at once?
 
 	self.autoVendorFrame.listScrollFrame = CreateFrame("Frame", "", self.autoVendorFrame)
     local listFrame = self.autoVendorFrame.listScrollFrame
@@ -210,7 +210,7 @@ function EV:AutoVendorFrameCreate()
 	listFrame.rows = rows
 
     self.autoVendorFrame.deleteButton = CreateFrame("Button", "ExtendedVendorUiAutoVendorDeleteButton", self.autoVendorFrame.listScrollFrame, "StandardButtonTemplate")
-    self.autoVendorFrame.deleteButton:SetPoint("TOPLEFT", self.autoVendorFrame.listScrollFrame,"BOTTOMLEFT", 0, -3)
+    self.autoVendorFrame.deleteButton:SetPoint("TOPLEFT", self.autoVendorFrame.listScrollFrame,"BOTTOMLEFT", 0, -10)
     self.autoVendorFrame.deleteButton:SetSize(150,25)
     self.autoVendorFrame.deleteButton:SetScript("OnClick",  function() self:DeleteVendorListItem() end)
     self.autoVendorFrame.deleteButton:SetText("Delete Selected")
@@ -227,7 +227,7 @@ function EV:AutoVendorFrameCreate()
 	end)
 	self.autoVendorFrame.addButton:SetScript("OnEnter", function(button)
 		GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT", 0, 20)
-		GameTooltip:AddLine("Drag and drop a spell or item to add it to list")
+		GameTooltip:AddLine("Drag and drop or set keybinding in keybinding interface to a item to add it to list")
 		GameTooltip:Show()
 	end)
 	self.autoVendorFrame.addButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
