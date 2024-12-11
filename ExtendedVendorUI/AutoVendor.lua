@@ -116,7 +116,7 @@ function EV:AutoVendorFrameCreate()
 		listFrame.lable = listFrame:CreateFontString(nil , "BORDER", "GameFontNormal")
 		listFrame.lable:SetJustifyH("LEFT")
 		listFrame.lable:SetPoint("TOPLEFT", listFrame, 2, 15)
-		listFrame.lable:SetText("Click to select or Hold Alt to multiselect")
+		listFrame.lable:SetText("Click to select or hold Alt to multiselect")
 
 	function EV:ListScrollFrameUpdate(isChecked)
         local search =  string.trim(self.autoVendorFrame.searchbox:GetText())
