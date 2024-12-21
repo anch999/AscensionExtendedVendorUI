@@ -1,4 +1,4 @@
-local EV = LibStub("AceAddon-3.0"):NewAddon("ExtendedVendorUI", "AceTimer-3.0", "AceEvent-3.0", "SettingsCreater-1.0")
+local EV = LibStub("AceAddon-3.0"):NewAddon("ExtendedVendorUI", "AceTimer-3.0", "AceEvent-3.0", "SettingsCreator-1.0")
 ExtendedVendorUI = EV
 EV.dewdrop = AceLibrary("Dewdrop-2.0")
 EV.Version = 1
