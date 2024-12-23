@@ -278,6 +278,7 @@ end
 function EV:AutoVendorItems()
     if GetCursorInfo() then return end
 	local junkToSell = MerchantFrame.isSelling
+    wipe(MerchantFrame.receipt)
 	-- gather all grey items
 	if not junkToSell then
 		junkToSell = {}
@@ -288,9 +289,9 @@ function EV:AutoVendorItems()
 				if itemID then
 					local _, link, quality, _, _, invType, itemSubType, _, _, _, vendorSell = GetItemInfo(itemID)
                     local tootltipInfo = self:GetTooltipItemInfo(link)
-					if not self.blackList[itemID] and (self.whiteList[itemID] or self.charWhiteList[itemID] or
-                    (quality and quality == 0 and invType and invType ~= "Quest" and vendorSell and vendorSell > 0) or
-                    (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and (itemSubType ~= "INVTYPE_TABARD" or itemSubType ~= "INVTYPE_SHIRT") and vendorSell and vendorSell > 0) or
+					if not self.blackList[itemID] and (self.whiteList[itemID] or self.charWhiteList[itemID] or (vendorSell and vendorSell > 0) and
+                    (quality and quality == 0 and invType and invType ~= "Quest") or
+                    (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and (itemSubType ~= "INVTYPE_TABARD" or itemSubType ~= "INVTYPE_SHIRT")) or
                     (self.db.AlreadyKnownBop and tootltipInfo.isKnown and (tootltipInfo.isBoP or tootltipInfo.isSoulbound)) or
                     (self.db.AlreadyKnownBoe and tootltipInfo.isKnown and (not tootltipInfo.isBoP and not tootltipInfo.isSoulbound))) then
 						local itemCount = select(2, GetContainerItemInfo(bag, slot)) or 1
@@ -319,7 +320,7 @@ function EV:AutoVendorItems()
         end
 		PickupContainerItem(item.bag, item.slot)
 		PickupMerchantItem()
-		SendSystemMessage(format(MERCHANT_AUTO_SOLD_ITEM, item.link, item.count, GetMoneyString(item.vendorSell)))
+        tinsert(MerchantFrame.receipt,format(MERCHANT_AUTO_SOLD_ITEM, item.link, item.count, GetMoneyString(item.vendorSell)))
 		sold = sold + 1
 	end
 
@@ -327,12 +328,24 @@ function EV:AutoVendorItems()
 		return
 	end
 	if MerchantFrame.junkProfit > 0 then
-		SendSystemMessage(format(MERCHANT_AUTO_SOLD_RECEIPT, GetMoneyString(MerchantFrame.junkProfit)))
-		MerchantFrame.junkProfit = 0
+		local text = format(MERCHANT_AUTO_SOLD_RECEIPT, GetMoneyString(MerchantFrame.junkProfit))
+        DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00|Hspell:ExtendedVendorUI:VendorReceipt|h"..text..CYAN.." [Vendor Receipt]|h|r")
+        MerchantFrame.junkProfit = 0
 	end
 	MerchantFrame.hasSoldJunk = true
 	MerchantFrame.isSelling = nil
 end
+
+hooksecurefunc("SetItemRef", function(link)
+    local linkType, addon, param1 = strsplit(":", link)
+    if linkType == "spell" and addon == "ExtendedVendorUI" then
+       if param1 == "VendorReceipt" and MerchantFrame.receipt and #MerchantFrame.receipt > 0 then
+        for _, itemReceipt in pairs(MerchantFrame.receipt) do
+            DEFAULT_CHAT_FRAME:AddMessage(itemReceipt)
+        end
+       end
+    end
+end)
 
 function EV:OpenAutoVendorListMenu(button)
     GameTooltip:Hide()

@@ -99,9 +99,8 @@ function EV:CreateUI()
         MerchantFrameTab2:Hide()
         MerchantFrameCloseButton:Hide()
         MerchantFrameSellJunkFrame:Hide()
+        MerchantFrame.receipt = {}
         C_CVar.Set("autoSellJunk", "0")
-
-
 
         self.UpdateMerchantInfoOld = MerchantFrame_UpdateMerchantInfo
         MerchantFrame_UpdateMerchantInfo = EV.UpdateMerchantInfo
