@@ -8,7 +8,7 @@ local fac = UnitFactionGroup("player")
 
 
 local frameLoaded
-function EV:CreateUI()
+function EV:InitializeUI()
         if frameLoaded then return end
         MERCHANT_ITEMS_PER_PAGE = 20
         -------------------Main Frame-------------------

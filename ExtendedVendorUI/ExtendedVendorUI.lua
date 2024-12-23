@@ -41,8 +41,8 @@ function EV:OnEnable()
     self.whiteList = self.db.WhiteList
     self.charWhiteList = self.charDB.WhiteList
     self.blackList = self.db.BlackList
-    self:CreateOptionsUI()
-    self:CreateUI()
+    self:InitializeOptionsUI()
+    self:InitializeUI()
 end
 
 --[[

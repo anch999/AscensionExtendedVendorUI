@@ -9,7 +9,7 @@ function EV:OptionsToggle()
 end
 
 --Creates the options frame and all its assets
-function EV:CreateOptionsUI()
+function EV:InitializeOptionsUI()
 	local Options = {
 		AddonName = "ExtendedVendorUI",
 		TitleText = "ExtendedVendorUI Settings",
