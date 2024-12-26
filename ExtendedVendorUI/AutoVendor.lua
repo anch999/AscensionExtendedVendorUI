@@ -309,9 +309,7 @@ function EV:AutoVendorItems()
 		end
 	end
 
-	local sold = 1
-
-	while sold <= 12 and #junkToSell > 0 do
+	while #junkToSell > 0 do
 		local item = tremove(junkToSell)
 		MerchantFrame.junkProfit = MerchantFrame.junkProfit + item.vendorSell
         local appearanceID = C_Appearance.GetItemAppearanceID(item.itemID)
@@ -321,17 +319,18 @@ function EV:AutoVendorItems()
 		PickupContainerItem(item.bag, item.slot)
 		PickupMerchantItem()
         tinsert(MerchantFrame.receipt,format(MERCHANT_AUTO_SOLD_ITEM, item.link, item.count, GetMoneyString(item.vendorSell)))
-		sold = sold + 1
 	end
 
 	if #junkToSell > 0 then
 		return
 	end
+
 	if MerchantFrame.junkProfit > 0 then
 		local text = format(MERCHANT_AUTO_SOLD_RECEIPT, GetMoneyString(MerchantFrame.junkProfit))
-        DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00|Hspell:ExtendedVendorUI:VendorReceipt|h"..text..CYAN.." [Vendor Receipt]|h|r")
+        Timer.After(2, function()DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00|Hspell:ExtendedVendorUI:VendorReceipt|h"..text..CYAN.." [Vendor Receipt]|h|r") end)
         MerchantFrame.junkProfit = 0
 	end
+
 	MerchantFrame.hasSoldJunk = true
 	MerchantFrame.isSelling = nil
 end
