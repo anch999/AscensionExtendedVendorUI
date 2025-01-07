@@ -10,7 +10,7 @@ EV.worldFrameHook = {}
 
 --Set Savedvariables defaults
 local DefaultSettings  = {
-    TxtSize         = 12,
+    TxtSize = 12,
     WhiteList = {},
     BlackList = {},
     AutoVendor = false,
