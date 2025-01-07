@@ -240,7 +240,7 @@ function EV:DeleteVendorListItem()
     if checked and self[self.selectedList] then
         self[self.selectedList][checked] = nil
     elseif checkedList then
-        for _, itemID in pairs(checkedList) do
+        for itemID, _ in pairs(checkedList) do
             self[self.selectedList][itemID] = nil
         end
     end
@@ -289,15 +289,15 @@ function EV:AutoVendorItems()
 				if itemID then
 					local _, link, quality, _, _, invType, itemSubType, _, _, _, vendorSell = GetItemInfo(itemID)
                     local tootltipInfo = self:GetTooltipItemInfo(link)
-					if not self.blackList[itemID] and (self.whiteList[itemID] or self.charWhiteList[itemID] or (vendorSell and vendorSell > 0) and
-                    (quality and quality == 0 and invType and invType ~= "Quest") or
-                    (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and (itemSubType ~= "INVTYPE_TABARD" or itemSubType ~= "INVTYPE_SHIRT")) or
-                    (self.db.AlreadyKnownBop and tootltipInfo.isKnown and (tootltipInfo.isBoP or tootltipInfo.isSoulbound)) or
-                    (self.db.AlreadyKnownBoe and tootltipInfo.isKnown and (not tootltipInfo.isBoP and not tootltipInfo.isSoulbound))) then
-						local itemCount = select(2, GetContainerItemInfo(bag, slot)) or 1
-						vendorSell = vendorSell * itemCount
-						tinsert(junkToSell, {bag = bag, slot = slot, link = link, count = itemCount, vendorSell = vendorSell, itemID = itemID})
-					end
+                    if (not self.blackList[itemID] and (vendorSell and vendorSell > 0)) and
+                        (self.whiteList[itemID] or self.charWhiteList[itemID] or (quality and quality == 0 and invType and invType ~= "Quest") or
+                        (self.db.VendorCommonItems and quality and quality == 1 and invType and (invType == "Weapon" or invType == "Armor") and (itemSubType ~= "INVTYPE_TABARD" or itemSubType ~= "INVTYPE_SHIRT")) or
+                        (self.db.AlreadyKnownBop and tootltipInfo.isKnown and (tootltipInfo.isBoP or tootltipInfo.isSoulbound)) or
+                        (self.db.AlreadyKnownBoe and tootltipInfo.isKnown and (not tootltipInfo.isBoP and not tootltipInfo.isSoulbound))) then
+                        local itemCount = select(2, GetContainerItemInfo(bag, slot)) or 1
+                        vendorSell = vendorSell * itemCount
+                        tinsert(junkToSell, {bag = bag, slot = slot, link = link, count = itemCount, vendorSell = vendorSell, itemID = itemID, quality = quality})
+                    end
 				end
 			end
 		end
