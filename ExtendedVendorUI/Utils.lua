@@ -1,4 +1,4 @@
-local EV = LibStub("AceAddon-3.0"):GetAddon("ExtendedVendorUI")
+local Utils = LibStub("AceAddon-3.0"):GetAddon("ExtendedVendorUI")
 local CYAN =  "|cff00ffff"
 local WHITE = "|cffFFFFFF"
 local LIMEGREEN = "|cFF32CD32"
@@ -11,7 +11,7 @@ local GREEN  = "|cff00ff00"
 -- item's tooltip
 --========================================
 local cTip = CreateFrame("GameTooltip","cTooltip",nil,"GameTooltipTemplate")
-function EV:GetTooltipItemInfo(link, bag, slot)
+function Utils:GetTooltipItemInfo(link, bag, slot)
     cTip:SetOwner(UIParent, "ANCHOR_NONE")
 
     -- set up return values
@@ -40,9 +40,9 @@ function EV:GetTooltipItemInfo(link, bag, slot)
 end
 
 --for a adding a divider to dew drop menus 
-function EV:AddDividerLine(maxLenght)
+function Utils:AddDividerLine(maxLenght)
     local text = WHITE.."----------------------------------------------------------------------------------------------------"
-    EV.dewdrop:AddLine(
+    self.Dewdrop:AddLine(
         'text' , text:sub(1, maxLenght),
         'textHeight', self.db.txtSize,
         'textWidth', self.db.txtSize,
@@ -52,7 +52,7 @@ function EV:AddDividerLine(maxLenght)
     return true
 end
 
-function EV:GetTipAnchor(frame)
+function Utils:GetTipAnchor(frame)
     local x, y = frame:GetCenter()
     if not x or not y then return 'TOPLEFT', 'BOTTOMLEFT' end
     local hhalf = (x > UIParent:GetWidth() * 2 / 3) and 'RIGHT' or (x < UIParent:GetWidth() / 3) and 'LEFT' or ''
@@ -60,12 +60,12 @@ function EV:GetTipAnchor(frame)
     return vhalf .. hhalf, frame, (vhalf == 'TOP' and 'BOTTOM' or 'TOP') .. hhalf
 end
 
-function EV:PairsByKeys(t, reverse)
+function Utils:PairsByKeys(t, reverse)
     local function order(a, b)
         if reverse then
             return a > b
         else
-            return a<b
+            return a < b
         end
     end
     local a = {}
@@ -94,7 +94,7 @@ local itemEquipLocConversion = {
     "INVTYPE_WEAPONMAINHAND","INVTYPE_WEAPONOFFHAND","INVTYPE_HOLDABLE","INVTYPE_AMMO",
     "INVTYPE_THROWN","INVTYPE_RANGEDRIGHT","INVTYPE_QUIVER","INVTYPE_RELIC",
 }
-function EV:GetItemInfo(item)
+function Utils:GetItemInfo(item)
 	item = tonumber(item) and Item:CreateFromID(item) or Item:CreateFromLink(item)
     if not item.itemID then return end
 	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item.itemID)
@@ -110,4 +110,43 @@ function EV:GetItemInfo(item)
 		end
 	end
 	return itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice
+end
+
+function Utils:PairsByKeys(t, rUtilserse)
+    local function order(a, b)
+        if rUtilserse then
+            return a > b
+        else
+            return a<b
+        end
+    end
+    local a = {}
+    for n in pairs(t) do
+      table.insert(a, n)
+    end
+    table.sort(a, function(a,b) return order(a,b)  end)
+
+    local i = 0
+    local iter = function()
+      i = i + 1
+      if a[i] == nil then
+        return nil
+      else
+        return a[i], t[a[i]]
+      end
+    end
+    return iter
+end
+
+function Utils:SetGameTooltip(button, text)
+	GameTooltip:ClearLines()
+	GameTooltip:SetOwner(button, "ANCHOR_TOPLEFT")
+	if type(text) == "table" then
+		for _, textLine in pairs(text) do
+			GameTooltip:AddLine(textLine)
+		end
+	else
+		GameTooltip:AddLine(text)
+	end
+	GameTooltip:Show()
 end

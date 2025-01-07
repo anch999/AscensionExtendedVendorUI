@@ -23,11 +23,11 @@ function EV:InitializeUI()
         self.uiFrame:SetToplevel(true)
         self.uiFrame:SetScale(self.db.MerchantFrameScale or 1)
         self.uiFrame:Hide()
-        self.uiFrame:SetScript("OnMouseDown", function() self.dewdrop:Close() end)
-        self.uiFrame:SetScript("OnEnter", function() self.dewdrop:Close() end)
+        self.uiFrame:SetScript("OnMouseDown", function() self.Dewdrop:Close() end)
+        self.uiFrame:SetScript("OnEnter", function() self.Dewdrop:Close() end)
         self.uiFrame:SetScript("OnShow", function() self:UiOnShow() end)
         self.uiFrame:SetScript("OnHide", function()
-            self.dewdrop:Close()
+            self.Dewdrop:Close()
             self:VendorFrameOnHide()
             end)
         self.uiFrame:SetScript("OnDragStart", function()
@@ -48,8 +48,8 @@ function EV:InitializeUI()
         self.uiFrame.itemPanel:SetPoint("CENTER", self.uiFrame, 0, -14)
         self.uiFrame.itemPanel:EnableMouse()
         self.uiFrame.itemPanel:EnableMouseWheel()
-        self.uiFrame.itemPanel:SetScript("OnMouseDown", function() self.dewdrop:Close() end)
-        self.uiFrame.itemPanel:SetScript("OnEnter", function() self.dewdrop:Close() end)
+        self.uiFrame.itemPanel:SetScript("OnMouseDown", function() self.Dewdrop:Close() end)
+        self.uiFrame.itemPanel:SetScript("OnEnter", function() self.Dewdrop:Close() end)
 
         self.uiFrame.repairFrame = CreateFrame("Frame", "ExtendedVendorUiRepairFrame", self.uiFrame, "InsetFrameTemplate2")
         self.uiFrame.repairFrame:SetSize(150, 55)
@@ -136,8 +136,8 @@ function EV:InitializeUI()
         self.uiFrame.filterButton = CreateFrame("Button", "ExtendedVendorUiFilterButton", self.uiFrame, "ExtendedVendorUIDropMenuTemplate")
         self.uiFrame.filterButton:SetPoint("TOPRIGHT", self.uiFrame, -13, -33)
         self.uiFrame.filterButton:SetScript("OnClick", function(button)
-            if self.dewdrop:IsOpen() then
-                self.dewdrop:Close()
+            if self.Dewdrop:IsOpen() then
+                self.Dewdrop:Close()
             else
                 self:OpenFilterMenu(button)
             end
@@ -162,30 +162,40 @@ function EV:InitializeUI()
             self:UpdateMerchantInfo()
         end)
 
+        --Options Button
+        self.uiFrame.optionsCogButton = CreateFrame("Button", "ExtendedVendorUiSettingsCog", self.uiFrame, "SettingsGearButtonTemplate")
+        self.uiFrame.optionsCogButton:SetPoint("RIGHT", self.uiFrame.searchbox, "LEFT" ,-6,0)
+        self.uiFrame.optionsCogButton:RegisterForClicks("AnyDown")
+        self.uiFrame.optionsCogButton:SetScript("OnClick", function(button,buttonClick) self:OpenSettingQuickMenu(button) end)
+        self.uiFrame.optionsCogButton:SetScript("OnEnter", function(button)
+            self:SetGameTooltip(button,"Options")
+        end)
+        self.uiFrame.optionsCogButton:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
         function MerchantItemButton_OnModifiedClick(self, button)
             if ( MerchantFrame.selectedTab == 1 ) then
                 -- Is merchant frame
                 if ( HandleModifiedItemClick(GetMerchantItemLink(self:GetID())) ) then
-                    return;
+                    return
                 end
                     if IsAltKeyDown() then
-                        local maxStack = GetMerchantItemMaxStack(self:GetID());
+                        local maxStack = GetMerchantItemMaxStack(self:GetID())
                         if ( self.extendedCost ) then
-                            MerchantFrame_ConfirmExtendedItemCost(self);
+                            MerchantFrame_ConfirmExtendedItemCost(self)
                         elseif ( self.price and self.price >= MERCHANT_HIGH_PRICE_COST ) then
-                            MerchantFrame_ConfirmHighCostItem(self);
+                            MerchantFrame_ConfirmHighCostItem(self)
                         else
-                            BuyMerchantItem(self:GetID(),maxStack);
+                            BuyMerchantItem(self:GetID(),maxStack)
                         end
                     elseif ( IsModifiedClick("SPLITSTACK") ) then
-                        local maxStack = GetMerchantItemMaxStack(self:GetID());
+                        local maxStack = GetMerchantItemMaxStack(self:GetID())
                         if ( self.price and (self.price > 0) ) then
-                            local canAfford = floor(GetMoney() / self.price);
+                            local canAfford = floor(GetMoney() / self.price)
                             if ( canAfford < maxStack ) then
-                                maxStack = canAfford;
+                                maxStack = canAfford
                             end
                         end
-                        OpenStackSplitFrame(1000, self, "BOTTOMLEFT", "TOPLEFT");
+                        OpenStackSplitFrame(1000, self, "BOTTOMLEFT", "TOPLEFT")
                         return
                 end
             else
@@ -636,28 +646,28 @@ function EV:UpdateAltCurrency(currencyTable)
             local button = self:CreateAtlCurrencys(i)
             if currency[2] and currency[3] == "honor" then
                 button.itemID = "Honor Points"
-                button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..fac);
-                button.icon:SetSize(16,16);
+                button.icon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..fac)
+                button.icon:SetSize(16,16)
                 Timer.After(.2, function() button.Lable:SetText("Honor Points: |cffffffff"..GetHonorCurrency()) end)
             elseif currency[2] and currency[3] == "arena" then
                 button.itemID = "Arena Points"
-                button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon");
-                button.icon:SetSize(16,16);
+                button.icon:SetTexture("Interface\\PVPFrame\\PVP-ArenaPoints-Icon")
+                button.icon:SetSize(16,16)
                 Timer.After(.2, function() button.Lable:SetText("Arena Points: |cffffffff"..GetArenaCurrency()) end)
             else
                 button.itemID = currency[1]
-                button.icon:SetTexture(GetItemIcon(currency[1]));
+                button.icon:SetTexture(GetItemIcon(currency[1]))
                 button.Lable:SetText("|cffffffff"..GetItemCount(currency[1]))
-                button.icon:SetSize(13,13);
+                button.icon:SetSize(13,13)
             end
             self:SetTooltip(button)
             if i == 1 then
                 button:ClearAllPoints()
-                button:SetPoint("RIGHT","MerchantMoneyFrameGoldButton", (- MerchantMoneyFrameGoldButtonText:GetStringWidth()) - 20,-1);
+                button:SetPoint("RIGHT","MerchantMoneyFrameGoldButton", (- MerchantMoneyFrameGoldButtonText:GetStringWidth()) - 20,-1)
             else
                 local lastFrame = i - 1
                 button:ClearAllPoints()
-                button:SetPoint("RIGHT",_G["MerchantFrame_AltCurrency"..lastFrame], "LEFT", (button.Lable:GetStringWidth() - 20) , 0);
+                button:SetPoint("RIGHT",_G["MerchantFrame_AltCurrency"..lastFrame], "LEFT", (button.Lable:GetStringWidth() - 20) , 0)
             end
             button:SetWidth(button.Lable:GetStringWidth() + 15)
             button:Show()
@@ -671,38 +681,12 @@ function EV:SetTooltip(button)
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -13, -50)
         if tonumber(button.itemID) then
-        GameTooltip:SetHyperlink(select(2,EV:GetItemInfo(button.itemID)));
+        GameTooltip:SetHyperlink(select(2,EV:GetItemInfo(button.itemID)))
         else
             GameTooltip:AddLine(button.itemID)
         end
         GameTooltip:Show()
     end)
-end
-
-function EV:PairsByKeys(t, reverse)
-    local function order(a, b)
-        if reverse then
-            return a > b
-        else
-            return a<b
-        end
-    end
-    local a = {}
-    for n in pairs(t) do
-      table.insert(a, n)
-    end
-    table.sort(a, function(a,b) return order(a,b)  end)
-
-    local i = 0
-    local iter = function()
-      i = i + 1
-      if a[i] == nil then
-        return nil
-      else
-        return a[i], t[a[i]]
-      end
-    end
-    return iter
 end
 
 function EV:CreateAtlCurrencys(num)
@@ -711,12 +695,12 @@ function EV:CreateAtlCurrencys(num)
     local altCurrencyFrameIcon = "MerchantFrame_AltCurrency_Icon"..num
     local button = CreateFrame("Button", altCurrencyFrame, ExtendedVendorUi)
     button:SetSize(100,15)
-    button.icon = button:CreateTexture(altCurrencyFrameIcon,"ARTWORK");
-    button.icon:SetSize(13,13);
-    button.icon:SetPoint("RIGHT", altCurrencyFrame,0,0);
-	button.Lable = button:CreateFontString(nil, "BORDER", "GameFontNormal");
-    button.Lable:SetPoint("RIGHT", altCurrencyFrameIcon, -15, 1);
-	button.Lable:SetJustifyH("RIGHT");
+    button.icon = button:CreateTexture(altCurrencyFrameIcon,"ARTWORK")
+    button.icon:SetSize(13,13)
+    button.icon:SetPoint("RIGHT", altCurrencyFrame,0,0)
+	button.Lable = button:CreateFontString(nil, "BORDER", "GameFontNormal")
+    button.Lable:SetPoint("RIGHT", altCurrencyFrameIcon, -15, 1)
+	button.Lable:SetJustifyH("RIGHT")
     button:SetScript("OnLeave", function () GameTooltip:Hide() end)
     button:Hide()
     numButtons = numButtons + 1
@@ -743,10 +727,6 @@ function EV:UpdateRepairButtons()
     MerchantRepairSettingsButton:SetPoint("TOPRIGHT", self.uiFrame.repairFrame, -3, -3)
     MerchantBuyBackItem:ClearAllPoints()
     MerchantBuyBackItem:SetPoint("LEFT", self.uiFrame.repairFrame, "RIGHT", 9, -1.2)
-end
-
-function MerchantFrame_OnHide()
-
 end
 
 function EV:VendorFrameOnHide()

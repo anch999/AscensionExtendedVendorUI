@@ -1,6 +1,6 @@
 local EV = LibStub("AceAddon-3.0"):NewAddon("ExtendedVendorUI", "AceTimer-3.0", "AceEvent-3.0", "SettingsCreator-1.0")
 ExtendedVendorUI = EV
-EV.dewdrop = AceLibrary("Dewdrop-2.0")
+EV.Dewdrop = AceLibrary("Dewdrop-2.0")
 EV.Version = 1
 
 local CYAN =  "|cff00ffff"
@@ -10,7 +10,7 @@ EV.worldFrameHook = {}
 
 --Set Savedvariables defaults
 local DefaultSettings  = {
-    TxtSize = 12,
+    txtSize = 12,
     WhiteList = {},
     BlackList = {},
     AutoVendor = false,

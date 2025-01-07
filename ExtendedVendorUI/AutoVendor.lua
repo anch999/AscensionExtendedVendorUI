@@ -45,8 +45,8 @@ function EV:AutoVendorFrameCreate()
         self.autoVendorFrame.listSelection:SetWidth(197)
         self.autoVendorFrame.listSelection:SetPoint("TOPLEFT", self.autoVendorFrame, 20, -45)
         self.autoVendorFrame.listSelection:SetScript("OnClick", function(button)
-            if self.dewdrop:IsOpen() then
-                self.dewdrop:Close()
+            if self.Dewdrop:IsOpen() then
+                self.Dewdrop:Close()
             else
                 self:OpenAutoVendorListMenu(button)
             end
@@ -348,8 +348,8 @@ end)
 
 function EV:OpenAutoVendorListMenu(button)
     GameTooltip:Hide()
-    if self.dewdrop:Open(button) then self.dewdrop:Close() return end
-    self.dewdrop:Open(button,
+    if self.Dewdrop:Open(button) then self.Dewdrop:Close() return end
+    self.Dewdrop:Open(button,
     'point', function(parent)
       local point1, _, point2 = self:GetTipAnchor(button)
       return point1, point2
@@ -359,8 +359,8 @@ function EV:OpenAutoVendorListMenu(button)
     end)
     if not self.worldFrameHook[button:GetName()] then
         WorldFrame:HookScript("OnEnter", function()
-        if self.dewdrop:IsOpen(button) then
-            self.dewdrop:Close()
+        if self.Dewdrop:IsOpen(button) then
+            self.Dewdrop:Close()
         end
     end)
     self.worldFrameHook[button:GetName()] = true
@@ -370,9 +370,9 @@ end
 function EV:UpdateAutoVendorListMenu(level, value)
     if level == 1 then
         for list, displayName in pairs(EV.autoVendorListNames) do
-            self.dewdrop:AddLine(
-                'textHeight', self.db.TxtSize,
-                'textWidth', self.db.TxtSize,
+            self.Dewdrop:AddLine(
+                'textHeight', self.db.txtSize,
+                'textWidth', self.db.txtSize,
                 'notCheckable', true,
                 'text', displayName,
                 'closeWhenClicked', true,

@@ -110,9 +110,9 @@ function EV:UpdateFilterMenu(level, value)
         for _, filter in ipairs(FilterList) do
             if filter.Name then
                 local checked = self:GetFilter(filter.Name)
-                self.dewdrop:AddLine(
-                    'textHeight', self.db.TxtSize,
-                    'textWidth', self.db.TxtSize,
+                self.Dewdrop:AddLine(
+                    'textHeight', self.db.txtSize,
+                    'textWidth', self.db.txtSize,
                     'text', filter.Name,
                     'hasArrow', true,
                     'value', filter,
@@ -122,9 +122,9 @@ function EV:UpdateFilterMenu(level, value)
                 )
             else
                 local checked = self:GetFilter(filter[2])
-                self.dewdrop:AddLine(
-                    'textHeight', self.db.TxtSize,
-                    'textWidth', self.db.TxtSize,
+                self.Dewdrop:AddLine(
+                    'textHeight', self.db.txtSize,
+                    'textWidth', self.db.txtSize,
                     'isRadio', true,
                     'text', filter[1],
                     'checked', checked,
@@ -132,30 +132,13 @@ function EV:UpdateFilterMenu(level, value)
                 )
             end
         end
-        self:AddDividerLine(65)
-        self.dewdrop:AddLine(
-            'textHeight', self.db.TxtSize,
-            'textWidth', self.db.TxtSize,
-            'notCheckable', true,
-            'text', "Auto Vendor Config",
-            'closeWhenClicked', true,
-            'func', function() self:AutoVendorConfigOpen() end
-        )
-        self.dewdrop:AddLine(
-            'textHeight', self.db.TxtSize,
-            'textWidth', self.db.TxtSize,
-            'notCheckable', true,
-            'text', "Options",
-            'closeWhenClicked', true,
-            'func', function() self:OptionsToggle() end
-        )
         self:CloseDewDrop(true, 65)
     elseif level == 2 then
         for _, filterGroup in ipairs(value) do
             if filterGroup.Name then
-                self.dewdrop:AddLine(
-                    'textHeight', self.db.TxtSize,
-                    'textWidth', self.db.TxtSize,
+                self.Dewdrop:AddLine(
+                    'textHeight', self.db.txtSize,
+                    'textWidth', self.db.txtSize,
                     'text', filterGroup.Name,
                     'isTitle', true,
                     'notCheckable', true
@@ -163,9 +146,9 @@ function EV:UpdateFilterMenu(level, value)
             end
             for _, filter in ipairs(filterGroup) do
                 local checked = self:GetFilter({filterGroup.Name, filter[2]})
-                self.dewdrop:AddLine(
-                    'textHeight', self.db.TxtSize,
-                    'textWidth', self.db.TxtSize,
+                self.Dewdrop:AddLine(
+                    'textHeight', self.db.txtSize,
+                    'textWidth', self.db.txtSize,
                     'isRadio', true,
                     'text', filter[1],
                     'checked', checked,
@@ -275,8 +258,8 @@ end
 -- ["robe"] = "INVTYPE_ROBE", note add a swap for robes  {"Body", "INVTYPE_BODY"},
 function EV:OpenFilterMenu(button)
     GameTooltip:Hide()
-    if self.dewdrop:Open(button) then self.dewdrop:Close() return end
-    self.dewdrop:Open(button,
+    if self.Dewdrop:Open(button) then self.Dewdrop:Close() return end
+    self.Dewdrop:Open(button,
     'point', function(parent)
       local point1, _, point2 = self:GetTipAnchor(button)
       return point1, point2
@@ -286,8 +269,8 @@ function EV:OpenFilterMenu(button)
     end)
     if not self.worldFrameHook[button:GetName()] then
         WorldFrame:HookScript("OnEnter", function()
-        if self.dewdrop:IsOpen(button) then
-            self.dewdrop:Close()
+        if self.Dewdrop:IsOpen(button) then
+            self.Dewdrop:Close()
         end
     end)
     self.worldFrameHook[button:GetName()] = true
@@ -298,7 +281,7 @@ function EV:CloseDewDrop(divider, maxLenght)
     if divider then
         self:AddDividerLine(maxLenght)
     end
-    self.dewdrop:AddLine(
+    self.Dewdrop:AddLine(
         'text', "Close Menu",
         'textR', 0,
         'textG', 1,
