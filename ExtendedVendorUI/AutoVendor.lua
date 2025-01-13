@@ -22,6 +22,7 @@ function EV:AutoVendorFrameCreate()
         self.autoVendorFrame:EnableMouse(true)
         self.autoVendorFrame:SetMovable(true)
         self.autoVendorFrame:SetToplevel(true)
+        self.autoVendorFrame:SetFrameStrata("HIGH")
         self.autoVendorFrame:RegisterForDrag("LeftButton")
         self.autoVendorFrame:SetScript("OnDragStart", function() self.autoVendorFrame:StartMoving() end)
         self.autoVendorFrame:SetScript("OnDragStop", function() self.autoVendorFrame:StopMovingOrSizing() end)
@@ -318,7 +319,7 @@ function EV:AutoVendorItems()
         end
 		PickupContainerItem(item.bag, item.slot)
 		PickupMerchantItem()
-        tinsert(MerchantFrame.receipt,format(MERCHANT_AUTO_SOLD_ITEM, item.link, item.count, GetMoneyString(item.vendorSell)))
+        tinsert(MerchantFrame.receipt, {item.itemID, item.count, item.vendorSell})
 	end
 
 	if #junkToSell > 0 then
@@ -327,6 +328,7 @@ function EV:AutoVendorItems()
 
 	if MerchantFrame.junkProfit > 0 then
 		local text = format(MERCHANT_AUTO_SOLD_RECEIPT, GetMoneyString(MerchantFrame.junkProfit))
+        MerchantFrame.receipt.total = GetMoneyString(MerchantFrame.junkProfit)
         Timer.After(2, function()DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00|Hspell:ExtendedVendorUI:VendorReceipt|h"..text..CYAN.." [Vendor Receipt]|h|r") end)
         MerchantFrame.junkProfit = 0
 	end
@@ -338,11 +340,9 @@ end
 hooksecurefunc("SetItemRef", function(link)
     local linkType, addon, param1 = strsplit(":", link)
     if linkType == "spell" and addon == "ExtendedVendorUI" then
-       if param1 == "VendorReceipt" and MerchantFrame.receipt and #MerchantFrame.receipt > 0 then
-        for _, itemReceipt in pairs(MerchantFrame.receipt) do
-            DEFAULT_CHAT_FRAME:AddMessage(itemReceipt)
+        if param1 == "VendorReceipt" and MerchantFrame.receipt and #MerchantFrame.receipt > 0 then
+            EV:OpenReceiptUI()
         end
-       end
     end
 end)
 

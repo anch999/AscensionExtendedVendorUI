@@ -28,4 +28,5 @@
 <Script file="Filter.lua"/>
 <Script file="SettingsQuickMenu.lua"/>
 <Script file="AutoVendor.lua"/>
+<Script file="VendorReceipt.lua"/>
 </Ui>
