@@ -12,11 +12,9 @@ function EV:InitializeUI()
         if frameLoaded then return end
         MERCHANT_ITEMS_PER_PAGE = 20
         -------------------Main Frame-------------------
-        self.uiFrame = CreateFrame("FRAME", "ExtendedVendorUi", UIParent, "PortraitFrameTemplate")
+        self.uiFrame = CreateFrame("FRAME", "ExtendedVendorUi", UIParent, "ExtendedVendorUIPortraitFrameTemplate")
         self.uiFrame:SetPoint("CENTER",0,0)
         self.uiFrame:SetSize(690,465)
-        self.uiFrame:EnableMouse(true)
-        self.uiFrame:SetMovable(true)
         self.uiFrame:SetFrameStrata("HIGH")
         self.uiFrame:RegisterForDrag("LeftButton")
         self.uiFrame:EnableKeyboard(true)
@@ -43,7 +41,7 @@ function EV:InitializeUI()
 	    tinsert(UISpecialFrames, "ExtendedVendorUi")
 
         --Loot Background
-        self.uiFrame.itemPanel = CreateFrame("Frame", "ExtendedVendorUiItemFrame", self.uiFrame, "InsetFrameTemplate2")
+        self.uiFrame.itemPanel = CreateFrame("Frame", "ExtendedVendorUiItemFrame", self.uiFrame, "ExtendedVendorUIFrameTemplate")
         self.uiFrame.itemPanel:SetSize((self.uiFrame:GetWidth()-20),375)
         self.uiFrame.itemPanel:SetPoint("CENTER", self.uiFrame, 0, -14)
         self.uiFrame.itemPanel:EnableMouse()

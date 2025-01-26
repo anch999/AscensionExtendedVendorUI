@@ -64,7 +64,20 @@ function EV:InitializeOptionsUI()
 					self.db.MerchantFrameScale = self.options.MerchantFrameScale:GetValue()
 					self.uiFrame:SetScale(self.db.MerchantFrameScale)
 				end
-			}
+			},
+			{
+				Type = "Menu",
+				Name = "SkinSelection",
+				Lable = "Skin",
+				Tooltip = "Change Atlasloot skin",
+				Func = 	function(name, selection)
+					self.db.SkinSelected = name
+					self:SetSkin(self.db.SkinSelected)
+				end,
+				Menu = function()
+					return self:GetSkinList(), self.db.SkinSelected
+				end
+			},
 		}
 		},
 	}

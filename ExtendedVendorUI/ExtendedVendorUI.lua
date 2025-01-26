@@ -7,13 +7,15 @@ local CYAN =  "|cff00ffff"
 local WHITE = "|cffFFFFFF"
 EV.defaultIcon = "Interface\\Icons\\INV_Misc_Book_06"
 EV.worldFrameHook = {}
+EV.skin = { buttons = {}, frames = {}, portraitFrames = {} }
 
 --Set Savedvariables defaults
 local DefaultSettings  = {
-    txtSize = 12,
+    txtSize = 14,
     WhiteList = {},
     BlackList = {},
     AutoVendor = false,
+    SkinSelected = "Default",
 }
 
 function EV:OnInitialize()
@@ -43,6 +45,8 @@ function EV:OnEnable()
     self.blackList = self.db.BlackList
     self:InitializeOptionsUI()
     self:InitializeUI()
+    self:InitializeSkins()
+
 end
 
 --[[

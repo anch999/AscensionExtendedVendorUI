@@ -12,9 +12,7 @@
         </Frames>
 
         <Scripts>
-            <OnLoad>
-                
-            </OnLoad>
+            <OnLoad> </OnLoad>
         </Scripts>
 
         <ButtonText parentKey="Text">
@@ -29,7 +27,9 @@
 
     <Button name="ExtendedVendorUIDropMenuTemplate" motionScriptsWhileDisabled="true" frameStrata="DIALOG" inherits="FilterDropDownMenuTemplate" virtual="true">
         <Scripts>
-            <OnLoad> </OnLoad>
+            <OnLoad> 
+                tinsert(ExtendedVendorUI.skin.buttons, self)
+            </OnLoad>
             <OnMouseDown> </OnMouseDown>
             <OnMouseUp> </OnMouseUp>
             <OnShow> </OnShow>
@@ -48,19 +48,20 @@
         </Layers>
     </Button>
 
-    <Frame name="ExtendedVendorUIInsetFrameTemplate" virtual="true">
-		<Attributes>
-			<Attribute name="layoutType" value="ExtendedVendorUIInsetFrameTemplate" type="string"/>
-		</Attributes>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture parentKey="Bg" file="Interface\FrameGeneral\UI-Background-Marble" horizTile="true" vertTile="true" setAllPoints="true"/>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Frame name="$parentNineSlice" parentKey="NineSlice" setAllPoints="true" inherits="NineSlicePanelTemplate"/>
-		</Frames>
-	</Frame>
+	<Frame name="ExtendedVendorUIPortraitFrameTemplate" enableMouse="true" virtual="true" movable="true" inherits="PortraitFrameTemplate">
+        <Scripts>
+            <OnLoad>    
+                tinsert(ExtendedVendorUI.skin.portraitFrames, self)
+            </OnLoad>
+		</Scripts>
+    </Frame>
 
+    <Frame name="ExtendedVendorUIFrameTemplate" virtual="true" inherits="InsetFrameTemplate2">
+        <Scripts>
+			<OnLoad> 
+                tinsert(ExtendedVendorUI.skin.frames, self)
+        	</OnLoad>
+		</Scripts>
+    </Frame>
     
 </Ui>

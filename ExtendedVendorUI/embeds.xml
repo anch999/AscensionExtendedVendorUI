@@ -1,8 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-<Include file="Templates.xml"/>
-
 <Script file="Libs\LibStub\LibStub.lua"/>
 <Include file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
 
@@ -22,6 +20,7 @@
 <Script file="Libs\DewdropLib\Dewdrop-2.0\Dewdrop-2.0.lua"/>
 
 <Script file="ExtendedVendorUI.lua"/>
+<Include file="Templates.xml"/>
 <Script file="Options.lua"/>
 <Script file="UI.lua"/>
 <Script file="Utils.lua"/>
@@ -29,4 +28,5 @@
 <Script file="SettingsQuickMenu.lua"/>
 <Script file="AutoVendor.lua"/>
 <Script file="VendorReceipt.lua"/>
+<Script file="Skin.lua"/>
 </Ui>
