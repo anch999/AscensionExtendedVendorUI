@@ -16,6 +16,7 @@ local DefaultSettings  = {
     BlackList = {},
     AutoVendor = false,
     SkinSelected = "Default",
+    FilterList = {},
 }
 
 function EV:OnInitialize()
@@ -51,8 +52,8 @@ end
 
 --[[
 EV:SlashCommand(msg):
-msg - takes the argument for the /mysticextended command so that the appropriate action can be performed
-If someone types /mysticextended, bring up the options box
+msg - takes the argument for the /extendedvendorui command so that the appropriate action can be performed
+If someone types /extendedvendorui, bring up the options box
 ]]
 function EV:SlashCommand(msg)
     local cmd, arg = string.split(" ", msg, 2)
