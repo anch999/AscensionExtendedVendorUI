@@ -33,6 +33,7 @@ end
 function EV:OnEnable()
     self.realm = GetRealmName()
     self.thisChar = GetUnitName("player")
+    self.playerKey = self.thisChar.." - "..self.realm
     self:RegisterEvent("MERCHANT_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
     self:RegisterEvent("MERCHANT_CLOSED")
@@ -47,6 +48,7 @@ function EV:OnEnable()
     self:InitializeOptionsUI()
     self:InitializeUI()
     self:InitializeSkins()
+    self:DisableElvUiMerchantSkin()
 
 end
 

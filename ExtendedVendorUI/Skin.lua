@@ -52,6 +52,29 @@ local skins = {
     },
 }
 
+function Skin:DisableElvUiMerchantSkin()
+    if IsAddOnLoaded("ElvUI") then
+        local maxDuration = 500/GetFramerate()
+        local startTime = debugprofilestop()
+        local function continue()
+            startTime = debugprofilestop()
+            local stop
+            while (not stop) do
+                if ElvPrivateDB.profiles[self.playerKey] then
+                    ElvPrivateDB.profiles[self.playerKey].skins.blizzard.merchant = false
+                    stop = true
+                    return
+                end
+                if (debugprofilestop() - startTime > maxDuration) then
+                    Timer.After(0, continue)
+                    return
+                end
+            end
+        end
+    return continue()
+    end
+end
+
 function Skin:InitializeSkins()
 
     function self:GetSkinList()

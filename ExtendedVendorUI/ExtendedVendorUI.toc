@@ -6,6 +6,6 @@
 ## X-Category: UnitFrame
 ## X-OptionsFrame: ExtendedVendorUIOptionsFrame
 ## DefaultState: enabled
-## Version: 2.0.0
+## Version: 2.0.1
 
 embeds.xml
