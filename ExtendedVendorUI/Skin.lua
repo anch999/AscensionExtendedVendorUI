@@ -60,9 +60,11 @@ function Skin:DisableElvUiMerchantSkin()
             startTime = debugprofilestop()
             local stop
             while (not stop) do
-                if ElvPrivateDB.profiles[self.playerKey] then
+                if ElvPrivateDB.profiles[self.playerKey] and ElvPrivateDB.profiles[self.playerKey].skins and ElvPrivateDB.profiles[self.playerKey].skins.blizzard then
                     ElvPrivateDB.profiles[self.playerKey].skins.blizzard.merchant = false
                     stop = true
+                    self:InitializeUI()
+                    self:InitializeSkins()
                     return
                 end
                 if (debugprofilestop() - startTime > maxDuration) then
@@ -71,7 +73,7 @@ function Skin:DisableElvUiMerchantSkin()
                 end
             end
         end
-    return continue()
+    return true, continue()
     end
 end
 

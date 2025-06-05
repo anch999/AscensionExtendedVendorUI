@@ -45,11 +45,12 @@ function EV:OnEnable()
     self.whiteList = self.db.WhiteList
     self.charWhiteList = self.charDB.WhiteList
     self.blackList = self.db.BlackList
+    local elvuiLoaded = self:DisableElvUiMerchantSkin()
     self:InitializeOptionsUI()
-    self:InitializeUI()
-    self:InitializeSkins()
-    self:DisableElvUiMerchantSkin()
-
+    if not elvuiLoaded then
+        self:InitializeUI()
+        self:InitializeSkins()
+    end
 end
 
 --[[
