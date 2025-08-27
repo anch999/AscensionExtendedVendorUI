@@ -273,9 +273,7 @@ function EV:UpdateMerchantInfo()
     local search = string.trim(ExtendedVendorUiSearchBox:GetText())
 	local name, texture, price, quantity, numAvailable, isUsable, extendedCost, r, g, b, notOptimal
     local link, quality, itemType, itemSubType, itemId, itemEquipLoc
-    local isFiltered = false
-    local isKnown = false
-    local isCollectionItemKnow = false
+    local isFiltered, isKnown, isHeroic, isMythic, isAscended, isCollectionItemKnow = false, false, false, false, false, false
 
     -- **************************************************
     --  Pre-check filtering if hiding filtered items
@@ -285,21 +283,23 @@ function EV:UpdateMerchantInfo()
         for i = 1, totalMerchantItems, 1 do
 		    name, texture, price, quantity, numAvailable, isUsable, extendedCost = GetMerchantItemInfo(i)
             if (name) then
-                isFiltered = false
                 link = GetMerchantItemLink(i)
                 quality = 1
-                isKnown = false
-                isCollectionItemKnow = false
+                isFiltered, isKnown, isHeroic, isMythic, isAscended, isCollectionItemKnow = false, false, false, false, false, false
 
                 -- get info from item link
                 if (link) then
-                    isKnown = self:GetTooltipItemInfo(link).isKnown
+                    local tooltip = self:GetTooltipItemInfo(link)
+                    isKnown = tooltip.isKnown
+                    isHeroic = tooltip.isHeroic
+                    isMythic = tooltip.isMythic
+                    isAscended = tooltip.isAscended
                     itemId = GetItemInfoFromHyperlink(link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(link)
                 end
 
-                isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc)
+                isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
 
                 -- ***** add item to list if not filtered *****
                 if (not isFiltered) then
@@ -400,13 +400,15 @@ function EV:UpdateMerchantInfo()
 				    merchantMoney:Show()
 			    end
 
-                isKnown = false
-                isFiltered = false
-                isCollectionItemKnow = false
+                isFiltered, isKnown, isHeroic, isMythic, isAscended, isCollectionItemKnow = false, false, false, false, false, false
 
                 quality = 1
                 if (itemButton.link) then
-                    isKnown = self:GetTooltipItemInfo(itemButton.link).isKnown
+                    local tooltip = self:GetTooltipItemInfo(itemButton.link)
+                    isKnown = tooltip.isKnown
+                    isHeroic = tooltip.isHeroic
+                    isMythic = tooltip.isMythic
+                    isAscended = tooltip.isAscended
                     itemId = GetItemInfoFromHyperlink(itemButton.link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
                     _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(itemButton.link)
@@ -417,7 +419,7 @@ function EV:UpdateMerchantInfo()
                 _G["MerchantItem" .. i .. "Name"]:SetTextColor(r, g, b)
 
                 if not self.db.FilterList.HideFiltered then
-                    isFiltered = self:IsFiltered(itemButton.link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc)
+                    isFiltered = self:IsFiltered(itemButton.link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
                 end
 
                 self:SearchDimItem(_G["MerchantItem" .. i], isFiltered)

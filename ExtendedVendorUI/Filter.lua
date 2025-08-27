@@ -73,21 +73,16 @@ local FilterList = {
         },
         {
         Name = "Weapons",
-        {"Weapon", "INVTYPE_WEAPON"},
-        {"Shield", "INVTYPE_SHIELD"},
-        {"Ranged", "INVTYPE_RANGED"},
-        },
-        {
-        Name = "Off Hand",
+        {"One Handed Weapon", "INVTYPE_WEAPON"},
         {"Two Handed Weapon", "INVTYPE_2HWEAPON"},
-        {"Weapon Mainhand", "INVTYPE_WEAPONMAINHAND"},
         {"Mainhand", "INVTYPE_WEAPONMAINHAND"},
-        {"Weapon Offhand", "INVTYPE_WEAPONOFFHAND"},
         {"Offhand", "INVTYPE_WEAPONOFFHAND"},
         {"Holdable", "INVTYPE_HOLDABLE"},
+        {"Ranged", "INVTYPE_RANGED"},
         {"Thrown", "INVTYPE_THROWN"},
         {"Rangedright", "INVTYPE_RANGEDRIGHT"},
         {"Relic", "INVTYPE_RELIC"},
+        {"Shield", "INVTYPE_SHIELD"},
         }
     },
     {
@@ -100,6 +95,16 @@ local FilterList = {
         {"Epic", 4},
         {"Vanity", 6},
         {"Heirloom", 7},
+        }
+    },
+    {
+        Name = "Difficulty",
+        {
+        Name = "Difficulties",
+            {"Normal", "Normal"},
+            {"Heroic Raid", "Heroic Raid"},
+            {"Mythic Raid", "Mythic Raid"},
+            {"Ascended Raid", "Ascended Raid"},
         }
     }
 }
@@ -179,7 +184,7 @@ function EV:GetFilter(filter)
     end
 end
 
-function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, i)
+function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
     local isFiltered, validSlot
     local filters = self.db.FilterList
 
@@ -214,6 +219,25 @@ function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, item
     -- check quality filter
     if filters.Quality and filters.Qualitys and not filters.Qualitys[quality] then
         isFiltered = true
+    end
+
+    local difficulties = {
+        ["Normal"] = (not isHeroic and not isMythic and not isAscended),
+        ["Heroic Raid"] = isHeroic,
+        ["Mythic Raid"] = isMythic,
+        ["Ascended Raid"] = isAscended,
+    }
+
+    -- check difficuilty filter
+    if filters.Difficulty and filters.Difficulties then
+        for dif, show in pairs(filters.Difficulties) do
+            if show and difficulties[dif] then
+                validSlot = true
+            end
+        end
+        if not validSlot then
+            isFiltered = true
+        end
     end
 
     -- check armor filter

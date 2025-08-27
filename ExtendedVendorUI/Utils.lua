@@ -32,6 +32,9 @@ function Utils:GetTooltipItemInfo(link, bag, slot)
         if text == ITEM_SOULBOUND then  binds.isSoulbound = true end
         if text == ITEM_BIND_ON_PICKUP then binds.isBoP = true end
         if text == ITEM_SPELL_KNOWN then binds.isKnown = true end
+        if text == "Heroic Raid" then binds.isHeroic = true end
+        if text == "Mythic Raid" then binds.isMythic = true end
+        if text == "Ascended Raid" then binds.isAscended = true end
     end
 
     cTip:Hide()
