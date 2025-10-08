@@ -85,7 +85,7 @@ function EV:InitializeOptionsUI()
 self.options = self:CreateOptionsPages(Options, ExtendedVendorUIDB)
 
 if LibStub:GetLibrary("LibAboutPanel", true) then
-	LibStub("LibAboutPanel").new("Extended Vendor UI Ascension", "ExtendedVendorUI")
+	LibStub("LibAboutPanel").new("ExtendedVendorUI", "ExtendedVendorUI")
 end
 
 end
