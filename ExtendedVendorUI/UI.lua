@@ -272,7 +272,7 @@ function EV:UpdateMerchantInfo()
     local indexes = {}
     local search = string.trim(ExtendedVendorUiSearchBox:GetText())
 	local name, texture, price, quantity, numAvailable, isUsable, extendedCost, r, g, b, notOptimal
-    local link, quality, itemType, itemSubType, itemId, itemEquipLoc
+    local link, quality, itemType, itemSubType, itemId, itemEquipLoc, itemLevel
     local isFiltered, isKnown, isHeroic, isMythic, isAscended, isCollectionItemKnow = false, false, false, false, false, false
 
     -- **************************************************
@@ -296,10 +296,10 @@ function EV:UpdateMerchantInfo()
                     isAscended = tooltip.isAscended
                     itemId = GetItemInfoFromHyperlink(link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
-                    _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(link)
+                    _, _, quality, itemLevel, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(link)
                 end
 
-                isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
+                isFiltered = self:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended, itemLevel)
 
                 -- ***** add item to list if not filtered *****
                 if (not isFiltered) then
@@ -411,7 +411,7 @@ function EV:UpdateMerchantInfo()
                     isAscended = tooltip.isAscended
                     itemId = GetItemInfoFromHyperlink(itemButton.link)
                     isCollectionItemKnow = C_VanityCollection.IsCollectionItemOwned(itemId)
-                    _, _, quality, _, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(itemButton.link)
+                    _, _, quality, itemLevel, _, itemType, itemSubType, _, itemEquipLoc, _, _ = self:GetItemInfo(itemButton.link)
                 end
 
                 -- set color
@@ -419,7 +419,7 @@ function EV:UpdateMerchantInfo()
                 _G["MerchantItem" .. i .. "Name"]:SetTextColor(r, g, b)
 
                 if not self.db.FilterList.HideFiltered then
-                    isFiltered = self:IsFiltered(itemButton.link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
+                    isFiltered = self:IsFiltered(itemButton.link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended, itemLevel)
                 end
 
                 self:SearchDimItem(_G["MerchantItem" .. i], isFiltered)

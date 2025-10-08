@@ -184,13 +184,23 @@ function EV:GetFilter(filter)
     end
 end
 
-function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended)
+function EV:IsFiltered(link, itemId, isKnown, isCollectionItemKnow, search, itemType, name, quality, itemSubType, itemEquipLoc, isHeroic, isMythic, isAscended, itemLevel)
     local isFiltered, validSlot
     local filters = self.db.FilterList
 
     -- check search filter
     if (string.len(search) > 0) then
-        if (not string.find(string.lower(name), string.lower(search), 1, true)) then
+        if string.find(search,"ilvl") then
+            search = gsub(search, "ilvl ", "")
+            local low, high = string.split(" ", search, 2)
+            low = tonumber(low)
+            high = tonumber(high)
+            if (not high and not low) or
+                (not high and low and low ~= itemLevel) or
+                (high and low and ((itemLevel < low) or (itemLevel > high)) ) then
+                    isFiltered = true
+            end
+        elseif (not string.find(string.lower(name), string.lower(search), 1, true)) then
             isFiltered = true
         end
     end
