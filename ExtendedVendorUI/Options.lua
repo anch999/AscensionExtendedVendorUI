@@ -13,6 +13,7 @@ function EV:InitializeOptionsUI()
 	local Options = {
 		AddonName = "ExtendedVendorUI",
 		TitleText = "ExtendedVendorUI Settings",
+		About = true,
 		{
 		Name = "ExtendedVendorUI",
 		Left = {
@@ -83,9 +84,5 @@ function EV:InitializeOptionsUI()
 	}
 
 self.options = self:CreateOptionsPages(Options, ExtendedVendorUIDB)
-
-if LibStub:GetLibrary("LibAboutPanel", true) then
-	LibStub("LibAboutPanel").new("ExtendedVendorUI", "ExtendedVendorUI")
-end
 
 end
